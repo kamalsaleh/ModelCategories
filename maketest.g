@@ -4,7 +4,7 @@
 
 LoadPackage( "ModelCategories" );
 
-AUTODOC_file_scan_list := [ "../PackageInfo.g", "../examples/doc/t.g", "../examples/t.g", "../gap/ModelCategories.gd", "../gap/ModelCategories.gi", "../init.g", "../makedoc.g", "../read.g" ];
+AUTODOC_file_scan_list := [ "../PackageInfo.g", "../examples/doc/t.g", "../examples/t.g", "../gap/ModelCategories.gd", "../gap/ModelCategories.gi", "../init.g", "../makedoc.g", "../maketest.g", "../read.g" ];
 
 LoadPackage( "GAPDoc" );
 
