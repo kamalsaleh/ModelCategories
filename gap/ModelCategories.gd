@@ -160,6 +160,36 @@ DeclareOperation( "AddFactorThroughAcyclicCofibration",
                   [ IsCapCategory, IsList ] );
 
 ##
+DeclareOperation( "FibrantModel", [ IsCapCategoryObject ] );
+
+DeclareOperation( "AddFibrantModel",
+                  [ IsCapCategory, IsFunction ] );
+
+DeclareOperation( "AddFibrantModel",
+                  [ IsCapCategory, IsFunction, IsInt ] );
+
+DeclareOperation( "AddFibrantModel",
+                  [ IsCapCategory, IsList, IsInt ] );
+
+DeclareOperation( "AddFibrantModel",
+                  [ IsCapCategory, IsList ] );
+
+##
+DeclareOperation( "CofibrantModel", [ IsCapCategoryObject ] );
+
+DeclareOperation( "AddCofibrantModel",
+                  [ IsCapCategory, IsFunction ] );
+
+DeclareOperation( "AddCofibrantModel",
+                  [ IsCapCategory, IsFunction, IsInt ] );
+
+DeclareOperation( "AddCofibrantModel",
+                  [ IsCapCategory, IsList, IsInt ] );
+
+DeclareOperation( "AddCofibrantModel",
+                  [ IsCapCategory, IsList ] );
+
+##
 DeclareOperation( "AreLeftHomotopic", [ IsCapCategoryMorphism, IsCapCategoryMorphism ] );
 
 DeclareOperation( "AddAreLeftHomotopic",
