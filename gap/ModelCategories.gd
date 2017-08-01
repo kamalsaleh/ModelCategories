@@ -114,6 +114,22 @@ DeclareOperation( "AddIsCofibrant",
                   [ IsCapCategory, IsList ] );
 
 ##
+DeclareFamilyProperty( "IsFibrantAndCofibrant",
+                       IsCapCategoryObject, "object" : reinstall := false );
+                       
+DeclareOperation( "AddIsFibrantAndCofibrant",
+                  [ IsCapCategory, IsFunction ] );
+
+DeclareOperation( "AddIsFibrantAndCofibrant",
+                  [ IsCapCategory, IsFunction, IsInt ] );
+
+DeclareOperation( "AddIsFibrantAndCofibrant",
+                  [ IsCapCategory, IsList, IsInt ] );
+
+DeclareOperation( "AddIsFibrantAndCofibrant",
+                  [ IsCapCategory, IsList ] );
+
+##
 DeclareOperation( "Lifting", [ IsCapCategoryMorphism, IsCapCategoryMorphism, IsCapCategoryMorphism, IsCapCategoryMorphism ] );
 
 DeclareOperation( "AddLifting",
@@ -248,3 +264,20 @@ DeclareOperation( "AddRightHomotopy",
 
 DeclareOperation( "AddRightHomotopy",
                   [ IsCapCategory, IsList ] );
+                  
+##
+##
+DeclareOperation( "ProjectiveLift", [ IsCapCategoryMorphism, IsCapCategoryMorphism ] );
+
+DeclareOperation( "AddProjectiveLift",
+                  [ IsCapCategory, IsFunction ] );
+
+DeclareOperation( "AddProjectiveLift",
+                  [ IsCapCategory, IsFunction, IsInt ] );
+
+DeclareOperation( "AddProjectiveLift",
+                  [ IsCapCategory, IsList, IsInt ] );
+
+DeclareOperation( "AddProjectiveLift",
+                  [ IsCapCategory, IsList ] );
+

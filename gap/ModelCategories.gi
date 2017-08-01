@@ -9,7 +9,13 @@ InstallValue( CAP_INTERNAL_MODEL_CATEGORIES_BASIC_OPERATIONS, rec( ) );
 
 InstallValue( MODEL_CATEGORIES_METHOD_NAME_RECORD, rec(
 
-## Basic Operations for Monoidal Categories
+## Basic Operations for Model Categories
+  
+  ProjectiveLift := rec( 
+  installation_name := "ProjectiveLift",
+  filter_list := [ "morphism", "morphism" ],
+  cache_name := "ProjectiveLift",
+  return_type := [ "morphism" ] ),
 
   IsWeakEquivalence := rec(
   installation_name := "IsWeakEquivalence",
@@ -51,6 +57,12 @@ InstallValue( MODEL_CATEGORIES_METHOD_NAME_RECORD, rec(
   installation_name := "IsCofibrant",
   filter_list := [ "object" ],
   cache_name := "IsCofibrant",
+  return_type := "bool" ),
+
+  IsFibrantAndCofibrant := rec(
+  installation_name := "IsFibrantAndCofibrant",
+  filter_list := [ "object" ],
+  cache_name := "IsFibrantAndCofibrant",
   return_type := "bool" ),
 
   Lifting := rec(

@@ -5,3 +5,5 @@
 #
 
 ReadPackage( "ModelCategories", "gap/ModelCategories.gd");
+ReadPackage( "ModelCategories", "gap/complexes.gd");
+
