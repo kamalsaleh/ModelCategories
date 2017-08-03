@@ -267,17 +267,17 @@ DeclareOperation( "AddRightHomotopy",
                   
 ##
 ##
-DeclareOperation( "ProjectiveLift", [ IsCapCategoryMorphism, IsCapCategoryMorphism ] );
-
-DeclareOperation( "AddProjectiveLift",
-                  [ IsCapCategory, IsFunction ] );
-
-DeclareOperation( "AddProjectiveLift",
-                  [ IsCapCategory, IsFunction, IsInt ] );
-
-DeclareOperation( "AddProjectiveLift",
-                  [ IsCapCategory, IsList, IsInt ] );
-
-DeclareOperation( "AddProjectiveLift",
-                  [ IsCapCategory, IsList ] );
+# DeclareOperation( "ProjectiveLift", [ IsCapCategoryMorphism, IsCapCategoryMorphism ] );
+# 
+# DeclareOperation( "AddProjectiveLift",
+#                   [ IsCapCategory, IsFunction ] );
+# 
+# DeclareOperation( "AddProjectiveLift",
+#                   [ IsCapCategory, IsFunction, IsInt ] );
+# 
+# DeclareOperation( "AddProjectiveLift",
+#                   [ IsCapCategory, IsList, IsInt ] );
+# 
+# DeclareOperation( "AddProjectiveLift",
+#                   [ IsCapCategory, IsList ] );
 
