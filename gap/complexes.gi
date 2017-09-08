@@ -115,8 +115,6 @@ BindGlobal( "ModelStructureOnChainComplexes",
                
         B := Range( f );
         
-        X := Source( g );
-        
         P := CokernelObject( f );
         
         splitting_morphism := ProjectiveLift( IdentityMorphism( P ), CokernelProjection( f ) );
@@ -133,5 +131,20 @@ BindGlobal( "ModelStructureOnChainComplexes",
     Error( "The first argument should be an acyclic cofibration the second a fibration or the first is cofibration and the second is acyclic fibration" );
     
     end );
+    
+    AddFactorThroughAcyclicFibration( cat, 
+      function( f )
+      local A, B, cyl_f_to_B, cyl_f_to_cone_f, P_to_cone_f, P, A_to_cyl_f, i, Q_to_cyl_f;
+      A := Source( f );
+      B := Range( f );
+      cyl_f_to_B := NaturalMorphismFromMappingCylinderInRange( f );
+      cyl_f_to_cone_f := NaturalMorphismFromMappingCylinderInMappingCone( f );
+      P_to_cone_f := QuasiIsomorphismFromProjectiveResolution( MappingCone( f ) );
+      P := Source( P_to_cone_f );
+      A_to_cyl_f := NaturalInjectionOfSourceInMappingCylinder( f );
+      i := UniversalMorphismIntoFiberProduct( [ cyl_f_to_cone_f, P_to_cone_f ], [ A_to_cyl_f, ZeroMorphism( A, P ) ] );
+      Q_to_cyl_f := ProjectionInFactorOfFiberProduct( [ cyl_f_to_cone_f, P_to_cone_f ], 1 );
+      return [ i, PreCompose( Q_to_cyl_f, cyl_f_to_B ) ];
+      end );
   
  end );
