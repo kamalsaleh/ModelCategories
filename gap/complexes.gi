@@ -135,16 +135,53 @@ BindGlobal( "ModelStructureOnChainComplexes",
     AddFactorThroughAcyclicFibration( cat, 
       function( f )
       local A, B, cyl_f_to_B, cyl_f_to_cone_f, P_to_cone_f, P, A_to_cyl_f, i, Q_to_cyl_f;
+      
       A := Source( f );
+      
       B := Range( f );
+      
       cyl_f_to_B := NaturalMorphismFromMappingCylinderInRange( f );
+      
       cyl_f_to_cone_f := NaturalMorphismFromMappingCylinderInMappingCone( f );
+      
       P_to_cone_f := QuasiIsomorphismFromProjectiveResolution( MappingCone( f ) );
+      
       P := Source( P_to_cone_f );
+      
       A_to_cyl_f := NaturalInjectionOfSourceInMappingCylinder( f );
+      
       i := UniversalMorphismIntoFiberProduct( [ cyl_f_to_cone_f, P_to_cone_f ], [ A_to_cyl_f, ZeroMorphism( A, P ) ] );
+      
       Q_to_cyl_f := ProjectionInFactorOfFiberProduct( [ cyl_f_to_cone_f, P_to_cone_f ], 1 );
+      
       return [ i, PreCompose( Q_to_cyl_f, cyl_f_to_B ) ];
+      
       end );
-  
+      
+    AddFactorThroughAcyclicCofibration( cat,
+      function( f )
+      local A, B, cocyl_f_to_B, A_to_cocyl_f, cocyl_f_to_M, P_to_M, P, i, R_to_cocyl_f;
+      
+      A := Source( f );
+      
+      B := Range( f );
+      
+      cocyl_f_to_B := NaturalMorphismFromMappingCocylinderToRange( f );
+      
+      A_to_cocyl_f := NaturalMorphismFromSourceInMappingCocylinder( f );
+      
+      cocyl_f_to_M := CokernelProjection( A_to_cocyl_f );
+      
+      P_to_M := QuasiIsomorphismFromProjectiveResolution( CokernelObject( A_to_cocyl_f ) );
+      
+      P := Source( P_to_M );
+      
+      i := UniversalMorphismIntoFiberProduct( [ cocyl_f_to_M, P_to_M ], [ A_to_cocyl_f, ZeroMorphism( A, P ) ] );
+      
+      R_to_cocyl_f := ProjectionInFactorOfFiberProduct( [ cocyl_f_to_M, P_to_M ], 1 );
+      
+      return [ i, PreCompose( R_to_cocyl_f, cocyl_f_to_B ) ];
+      
+      end );
+      
  end );
