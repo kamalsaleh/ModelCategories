@@ -4,7 +4,7 @@
 
 LoadPackage( "ModelCategories" );
 
-AUTODOC_file_scan_list := [ "../PackageInfo.g", "../examples/doc/t.g", "../examples/t.g", "../gap/ModelCategories.gd", "../gap/ModelCategories.gi", "../init.g", "../makedoc.g", "../maketest.g", "../read.g" ];
+AUTODOC_file_scan_list := [ "../PackageInfo.g", "../examples/chains_category_of_left_presentations_over_polynomial_ring.g", "../examples/chains_category_of_rational_vector_spaces.g", "../examples/doc/t.g", "../gap/DerivationMethods.gi", "../gap/ModelCategories.gd", "../gap/ModelCategories.gi", "../gap/complexes.gd", "../gap/complexes.gi", "../init.g", "../makedoc.g", "../maketest.g", "../read.g" ];
 
 LoadPackage( "GAPDoc" );
 
