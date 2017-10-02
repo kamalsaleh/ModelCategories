@@ -176,7 +176,7 @@ DeclareOperation( "AddFactorThroughAcyclicCofibration",
                   [ IsCapCategory, IsList ] );
 
 ##
-DeclareOperation( "FibrantModel", [ IsCapCategoryObject ] );
+DeclareAttribute( "FibrantModel", IsCapCategoryObject );
 
 DeclareOperation( "AddFibrantModel",
                   [ IsCapCategory, IsFunction ] );
@@ -191,7 +191,37 @@ DeclareOperation( "AddFibrantModel",
                   [ IsCapCategory, IsList ] );
 
 ##
-DeclareOperation( "CofibrantModel", [ IsCapCategoryObject ] );
+DeclareAttribute( "AcyclicCofibrationIntoFibrantModel", IsCapCategoryObject );
+
+DeclareOperation( "AddAcyclicCofibrationIntoFibrantModel",
+                  [ IsCapCategory, IsFunction ] );
+
+DeclareOperation( "AddAcyclicCofibrationIntoFibrantModel",
+                  [ IsCapCategory, IsFunction, IsInt ] );
+
+DeclareOperation( "AddAcyclicCofibrationIntoFibrantModel",
+                  [ IsCapCategory, IsList, IsInt ] );
+
+DeclareOperation( "AddAcyclicCofibrationIntoFibrantModel",
+                  [ IsCapCategory, IsList ] );
+
+##
+DeclareAttribute( "AcyclicFibrationFromCofibrantModel", IsCapCategoryObject );
+
+DeclareOperation( "AddAcyclicFibrationFromCofibrantModel",
+                  [ IsCapCategory, IsFunction ] );
+
+DeclareOperation( "AddAcyclicFibrationFromCofibrantModel",
+                  [ IsCapCategory, IsFunction, IsInt ] );
+
+DeclareOperation( "AddAcyclicFibrationFromCofibrantModel",
+                  [ IsCapCategory, IsList, IsInt ] );
+
+DeclareOperation( "AddAcyclicFibrationFromCofibrantModel",
+                  [ IsCapCategory, IsList ] );
+
+##
+DeclareAttribute( "CofibrantModel", IsCapCategoryObject );
 
 DeclareOperation( "AddCofibrantModel",
                   [ IsCapCategory, IsFunction ] );

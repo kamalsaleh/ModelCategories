@@ -87,12 +87,25 @@ InstallValue( MODEL_CATEGORIES_METHOD_NAME_RECORD, rec(
   installation_name := "FibrantModel",
   filter_list := [ "object" ],
   cache_name := "FibrantModel",
+  return_type := [ "object" ] ),
+  
+  AcyclicCofibrationIntoFibrantModel := rec(
+  installation_name := "AcyclicCofibrationIntoFibrantModel",
+  filter_list := [ "object" ],
+  cache_name := "AcyclicCofibrationIntoFibrantModel",
   return_type := [ "morphism" ] ),
+  
   
   CofibrantModel := rec(
   installation_name := "CofibrantModel",
   filter_list := [ "object" ],
   cache_name := "CofibrantModel",
+  return_type := [ "object" ] ),
+  
+  AcyclicFibrationFromCofibrantModel := rec(
+  installation_name := "AcyclicFibrationFromCofibrantModel",
+  filter_list := [ "object" ],
+  cache_name := "AcyclicFibrationFromCofibrantModel",
   return_type := [ "morphism" ] ),
   
   AreLeftHomotopic := rec(
