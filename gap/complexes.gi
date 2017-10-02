@@ -8,27 +8,36 @@ BindGlobal( "ModelStructureOnChainComplexes",
       return IsQuasiIsomorphism( phi );
     end );
  
+ ### Fix this
  AddIsCofibration( cat, 
     function( phi )
-    local i;
+    local i, A, B;
     
-      if not HasActiveUpperBound( phi ) then 
-         Error( "the morphism must have an upper bound" );
-      fi;
+    A := Source( phi );
       
-      for i in [ 0 .. ActiveUpperBound( phi ) ] do 
+    B := Range( phi );
       
-          if not IsMonomorphism( phi[ i ] ) then 
+    if not IsBoundedChainComplex( A ) and IsBoundedChainComplex( B ) then 
+
+        Error( "Both source and range must be bounded" );
+        
+    fi;
+        
+      
+    for i in [ 0 .. Maximum( ActiveUpperBound( A ), ActiveUpperBound( B ) ) ] do 
           
-             return false;
-             
-          fi;
+        if not IsMonomorphism( phi[ i ] ) then 
           
-          if not IsProjective( CokernelObject( phi[ i ] ) ) then
+            return false;
              
-             return false;
+        fi;
+          
+        if not IsProjective( CokernelObject( phi[ i ] ) ) then
              
-          fi;
+             
+            return false;
+             
+        fi;
           
       od;
       
@@ -37,22 +46,28 @@ BindGlobal( "ModelStructureOnChainComplexes",
       end );
     
   AddIsFibration( cat, 
-     function( phi )
-     local i;
-     
-        if not HasActiveUpperBound( phi ) then
-           Error( "The morphism must have an upper bound" );
-        fi;
+    function( phi )
+    local i, A, B;
+    
+    A := Source( phi );
+      
+    B := Range( phi );
+      
+    if not IsBoundedChainComplex( A ) and IsBoundedChainComplex( B ) then 
+
+        Error( "Both source and range must be bounded" );
         
-        for i in [ 1 .. ActiveUpperBound( phi ) ] do 
+    fi;
+    
+    for i in [ 1 .. Maximum( ActiveUpperBound( A ), ActiveUpperBound( B ) ) ] do 
         
-            if not IsEpimorphism( phi[ i ] ) then 
+        if not IsEpimorphism( phi[ i ] ) then 
             
-               return false;
+            return false;
                
-            fi;
+        fi;
             
-        od;
+    od;
         
         return true;
         
