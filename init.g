@@ -6,4 +6,5 @@
 
 ReadPackage( "ModelCategories", "gap/ModelCategories.gd");
 ReadPackage( "ModelCategories", "gap/complexes.gd");
+ReadPackage( "ModelCategories", "gap/HomotopyCategory.gd");
 
