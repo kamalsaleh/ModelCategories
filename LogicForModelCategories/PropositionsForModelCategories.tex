@@ -1,0 +1,74 @@
+\begin{sequent}
+\begin{align*}
+a: \Obj ~|~ \IsFibrant( a ) \vdash \IsFibration \big( \UniversalMorphismIntoTerminalObject( a ) \big)
+\end{align*}
+\end{sequent}
+
+\begin{sequent}
+\begin{align*}
+a: \Obj ~|~ \IsFibrant( a ) \vdash \IsFibration \big( \UniversalMorphismIntoZeroObject( a ) \big)
+\end{align*}
+\end{sequent}
+
+\begin{sequent}
+\begin{align*}
+a: \Obj ~|~ \IsCofibrant( a ) \vdash \IsCofibration \big( \UniversalMorphismFromInitialObject( a ) \big)
+\end{align*}
+\end{sequent}
+
+\begin{sequent}
+\begin{align*}
+a: \Obj ~|~ \IsCofibrant( a ) \vdash \IsCofibration \big( \UniversalMorphismFromZeroObject( a ) \big)
+\end{align*}
+\end{sequent}
+
+\begin{sequent}
+\begin{align*}
+\alpha: \Mor, \beta: \Mor ~|~ \IsFibration( \alpha ), \IsFibration( \beta ) \vdash \IsFibration( \PreCompose( \alpha, \beta ) ) 
+\end{align*}
+\end{sequent}
+
+\begin{sequent}
+\begin{align*}
+\alpha: \Mor, \beta: \Mor ~|~ \IsCofibration( \alpha ), \IsCofibration( \beta ) \vdash \IsCofibration( \PreCompose( \alpha, \beta ) ) 
+\end{align*}
+\end{sequent}
+
+% If two of the morphisms f, g, gof is weak equivalence then so is the third
+\begin{sequent}
+\begin{align*}
+\alpha: \Mor, \beta: \Mor ~|~ \IsWeakEquivalence( \alpha ), \IsWeakEquivalence( \beta ) \vdash \IsWeakEquivalence( \PreCompose( \alpha, \beta ) ) 
+\end{align*}
+\end{sequent}
+
+% It seems that this case can not be handeld in CAP. Well, eventhough this is reasonable
+% \begin{sequent}
+% \begin{align*}
+% \alpha: \Mor, \beta: \Mor ~|~ \IsWeakEquivalence( \alpha ), \IsWeakEquivalence( \PreCompose( \alpha, \beta ) ) \vdash \IsWeakEquivalence( \beta ) 
+% \end{align*}
+% \end{sequent}
+
+% \begin{sequent}
+% \begin{align*}
+% \alpha: \Mor, \beta: \Mor ~|~ \IsWeakEquivalence( \beta ), \IsWeakEquivalence( \PreCompose( \alpha, \beta ) ) \vdash \IsWeakEquivalence( \alpha ) 
+% \end{align*}
+% \end{sequent}
+
+\begin{sequent}
+\begin{align*}
+a: \Obj ~|~ () \vdash \IsWeakEquivalence( \IdentityMorphism( a ) ) 
+\end{align*}
+\end{sequent}
+
+\begin{sequent}
+\begin{align*}
+a: \Obj ~|~ () \vdash \IsFibration( \IdentityMorphism( a ) ) 
+\end{align*}
+\end{sequent}
+
+\begin{sequent}
+\begin{align*}
+a: \Obj ~|~ () \vdash \IsCofibration( \IdentityMorphism( a ) ) 
+\end{align*}
+\end{sequent}
+
