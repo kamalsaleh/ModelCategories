@@ -51,13 +51,27 @@ InstallValue( MODEL_CATEGORIES_METHOD_NAME_RECORD, rec(
   installation_name := "IsFibrant",
   filter_list := [ "object" ],
   cache_name := "IsFibrant",
-  return_type := "bool" ),
+  return_type := "bool",
+  post_function := function( obj, is_fibrant )
+    if is_fibrant <> fail then 
+        if is_fibrant = true then 
+            SetIsFibration( UniversalMorphismIntoTerminalObject( obj ), true );
+        fi;
+    fi;
+    end ),
 
   IsCofibrant := rec(
   installation_name := "IsCofibrant",
   filter_list := [ "object" ],
   cache_name := "IsCofibrant",
-  return_type := "bool" ),
+  return_type := "bool",
+  post_function := function( obj, is_cofibrant )
+    if is_cofibrant <> fail then 
+        if is_cofibrant = true then 
+            SetIsCofibration( UniversalMorphismFromInitialObject( obj ), true );
+        fi;
+    fi;
+    end ),
 
   IsFibrantAndCofibrant := rec(
   installation_name := "IsFibrantAndCofibrant",
@@ -93,7 +107,10 @@ InstallValue( MODEL_CATEGORIES_METHOD_NAME_RECORD, rec(
   installation_name := "AcyclicCofibrationIntoFibrantModel",
   filter_list := [ "object" ],
   cache_name := "AcyclicCofibrationIntoFibrantModel",
-  return_type := [ "morphism" ] ),
+  return_type := [ "morphism" ],
+  post_function := function( obj, return_value )
+                   SetIsAcyclicCofibration( return_value, true );
+                   end ),
   
   
   CofibrantModel := rec(
@@ -106,7 +123,10 @@ InstallValue( MODEL_CATEGORIES_METHOD_NAME_RECORD, rec(
   installation_name := "AcyclicFibrationFromCofibrantModel",
   filter_list := [ "object" ],
   cache_name := "AcyclicFibrationFromCofibrantModel",
-  return_type := [ "morphism" ] ),
+  return_type := [ "morphism" ],
+  post_function := function( obj, return_value )
+                   SetIsAcyclicFibration( return_value, true );
+                   end ),
   
   AreLeftHomotopic := rec(
   installation_name := "AreLeftHomotopic",
@@ -137,3 +157,73 @@ InstallValue( MODEL_CATEGORIES_METHOD_NAME_RECORD, rec(
 CAP_INTERNAL_ENHANCE_NAME_RECORD( MODEL_CATEGORIES_METHOD_NAME_RECORD );
 
 CAP_INTERNAL_INSTALL_ADDS_FROM_RECORD( MODEL_CATEGORIES_METHOD_NAME_RECORD );
+
+#####################################
+##
+## Immediate Methods and Attributes 
+##
+#####################################
+
+InstallImmediateMethod( INSTALL_LOGICAL_IMPLICATIONS_AND_THEOREMS_FOR_MODEL_CATEGORY,
+            IsCapCategory and IsModelCategory, 
+            0,
+    function( category )
+   
+    AddPredicateImplicationFileToCategory( category,
+        Filename(
+            DirectoriesPackageLibrary( "ModelCategories", "LogicForModelCategories" ),
+            "PredicateImplicationsForModelCategories.tex" ) );
+   
+    AddTheoremFileToCategory( category,
+        Filename(
+            DirectoriesPackageLibrary( "ModelCategories", "LogicForModelCategories" ),
+        "PropositionsForModelCategories.tex" ) );
+     
+    TryNextMethod( );
+     
+end );
+
+##
+##
+InstallMethod( MorphismBetweenCofibrantModels,
+               [ IsCapCategoryMorphism ],
+    function( morphism )
+    local g, u, v, f;
+    
+    g := AcyclicFibrationFromCofibrantModel( Range( morphism ) );
+    
+    u := UniversalMorphismFromInitialObject( Source( g ) );
+    
+    v := PreCompose( AcyclicFibrationFromCofibrantModel( Source( morphism ) ), morphism );
+    
+    f := UniversalMorphismFromInitialObject( CofibrantModel( Source( morphism ) ) );
+    
+    Assert( 5, IsCofibration( f ) );
+    
+    SetIsCofibration( f, true );
+    
+    return Lifting( f, g, u, v );
+    
+    end );
+    
+##
+InstallMethod( MorphismBetweenFibrantModels,
+               [ IsCapCategoryMorphism ],
+    function( morphism )
+    local g, u, v, f;
+    
+    f := AcyclicCofibrationIntoFibrantModel( Source( morphism ) );
+    
+    v := UniversalMorphismIntoTerminalObject( Range( f ) );
+    
+    u := PreCompose( morphism, AcyclicCofibrationIntoFibrantModel( Range( morphism ) ) );
+    
+    g := UniversalMorphismIntoTerminalObject( FibrantModel( Range( f ) ) );
+    
+    Assert( 5, IsFibration( g ) );
+    
+    SetIsFibration( g, true );
+    
+    return Lifting( f, g, u, v );
+    
+end );

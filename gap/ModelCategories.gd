@@ -239,6 +239,10 @@ DeclareOperation( "AddCofibrantModel",
 DeclareOperation( "AddCofibrantModel",
                   [ IsCapCategory, IsList ] );
 
+DeclareAttribute( "MorphismBetweenCofibrantModels", IsCapCategoryMorphism );
+
+DeclareAttribute( "MorphismBetweenFibrantModels", IsCapCategoryMorphism );
+
 ##
 DeclareOperation( "AreLeftHomotopic", [ IsCapCategoryMorphism, IsCapCategoryMorphism ] );
 
