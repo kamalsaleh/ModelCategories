@@ -3,6 +3,8 @@
 BindGlobal( "ModelStructureOnChainComplexes",
  function( cat )
  
+ SetIsModelCategory( cat, true );
+ 
  AddIsWeakEquivalence( cat, 
     function( phi )
       return IsQuasiIsomorphism( phi );
