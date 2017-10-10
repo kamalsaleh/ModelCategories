@@ -216,7 +216,7 @@ BindGlobal( "ModelStructureOnChainComplexes",
       ##
       j := PreCompose( R_to_cocyl_f, cocyl_f_to_B );
       Assert( 5, IsFibration( j ) );
-      SetIsFibration( j, true );
+      #SetIsFibration( j, true );
       
       return [ i, j ];
       
