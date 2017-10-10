@@ -129,7 +129,7 @@ AddDerivationToCAP( AcyclicCofibrationIntoFibrantModel,
         
         Assert( 5, IsFibrant( Range( u ) ) );
         SetFibrantModel( obj, Range( u ) );
-         
+        
         return u;
          
     fi;
