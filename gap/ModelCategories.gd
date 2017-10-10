@@ -5,6 +5,8 @@
 #
 ##########################################################
 
+DeclareProperty( "IsModelCategory", IsCapCategory );
+
 DeclareGlobalVariable( "CAP_INTERNAL_MODEL_CATEGORIES_BASIC_OPERATIONS" );
 DeclareGlobalVariable( "MODEL_CATEGORIES_METHOD_NAME_RECORD" );
 
