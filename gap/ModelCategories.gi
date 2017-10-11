@@ -218,7 +218,7 @@ InstallMethod( MorphismBetweenFibrantModels,
     
     u := PreCompose( morphism, AcyclicCofibrationIntoFibrantModel( Range( morphism ) ) );
     
-    g := UniversalMorphismIntoTerminalObject( FibrantModel( Range( f ) ) );
+    g := UniversalMorphismIntoTerminalObject( Range( u ) );
     
     Assert( 5, IsFibration( g ) );
     
