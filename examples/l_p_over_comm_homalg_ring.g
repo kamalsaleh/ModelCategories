@@ -5,7 +5,6 @@ LoadPackage( "ModelCategories" );
 
 R := HomalgRingOfIntegers( );;
 cat := LeftPresentations( R: FinalizeCategory := false );
-#! Category of left presentations of Q[x,y,z]
 AddEpimorphismFromSomeProjectiveObject( cat, CoverByFreeModule );
 SetHasEnoughProjectives( cat, true );
 AddIsProjective( cat, function( P ) 
@@ -23,4 +22,9 @@ Finalize( chains );
 A := FreeLeftPresentation( 1, R );
 id_A := IdentityMorphism( A );
 phi := ChainMorphism( [ 6*id_A ], 1, [ 4*id_A ], 2, [ 10*id_A ], 1 );
+psi := ChainMorphism( [ 6*id_A ], 1, [ 4*id_A ], 2, [ 5*id_A ], 1 );
+
+phi_ := AsMorphismInHomotopyCategory( phi );
+psi_ := AsMorphismInHomotopyCategory( psi );
+
 

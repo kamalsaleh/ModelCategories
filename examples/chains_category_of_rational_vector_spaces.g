@@ -22,6 +22,7 @@ LoadPackage( "ModelCategories" );
  #<A bounded object in chain complexes category over category of matrices over Q with active lower bound -3 and active upper bound 13>
  A := DirectSum( [ ChainComplex( [ id ], 1 ), StalkChainComplex( K, 2 ), StalkChainComplex( K, 5 ), StalkChainComplex( K, 9 ) ] );
  #<A bounded object in chain complexes category over category of matrices over Q with active lower bound -1 and active upper bound 10>
+ quit();
  f := InjectionOfCofactorOfDirectSum( [ A, P ], 1 );
  #<A bounded morphism in chain complexes category over category of matrices over Q with active lower bound -1 and active upper bound 10>
  IsWellDefined( f );
