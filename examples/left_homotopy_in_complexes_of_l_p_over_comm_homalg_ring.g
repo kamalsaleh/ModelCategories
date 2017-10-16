@@ -75,7 +75,7 @@ Compute_Homotopy :=
   if Length( list ) = 1 then 
      b := list[ 1 ];
   else
-     b := Iterated( UnionOfRows, list );
+     b := Iterated( list, UnionOfRows );
   fi;
 
   mat := HomalgZeroMatrix( r, 0, ring );
@@ -130,7 +130,7 @@ Compute_Homotopy :=
          if Length( list ) = 1 then 
             current_b := list[ 1 ];
          else
-            current_b := Iterated( UnionOfRows, list );
+            current_b := Iterated( list, UnionOfRows );
          fi;
 
       current_mat := HomalgZeroMatrix( r, 0, ring );
@@ -189,7 +189,7 @@ Compute_Homotopy :=
          if Length( list ) = 1 then 
             current_b := list[ 1 ];
          else
-            current_b := Iterated( UnionOfRows, list );
+            current_b := Iterated( list, UnionOfRows );
          fi;
 
   current_mat := HomalgZeroMatrix( r, 0, ring );
