@@ -31,58 +31,21 @@ BindGlobal( "TheTypeOfHomotopyCapCategoryMorphism",
 InstallMethod( HomotopyCategory, 
                [ IsCapCategory and IsModelCategory ],
     function( cat )
-    local homotopy_category, is_equal_for_morphisms;
+    local homotopy_category, to_be_finalized;
     
-    homotopy_category := CreateCapCategory( Concatenation( "Homotopy category of ", Big_to_Small( Name( cat ) ) ) );
+    homotopy_category := CreateCapCategory( Concatenation( "Homotopy homotopy_category of ", Big_to_Small( Name( cat ) ) ) );
+
+    SetUnderlyingModelCategory( homotopy_category, cat );
     
-    if CanCompute( cat, "AreLeftHomotopic" ) then
-       is_equal_for_morphisms := 
-            function( morphism1, morphism2 )
-                return AreLeftHomotopic( morphism1, morphism2 );
-            end;
-    elif CanCompute( cat, "AreRightHomotopic" ) then
-       is_equal_for_morphisms := 
-            function( morphism1, morphism2 )
-                return AreRightHomotopic( morphism1, morphism2 );
-            end;
-    else
-        
-       is_equal_for_morphisms := ReturnTrue;
-       
+    INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES( homotopy_category );
+    
+    to_be_finalized := ValueOption( "FinalizeCategory" );
+   
+    if to_be_finalized = true then
+      
+       Finalize( homotopy_category );
+      
     fi;
-    
-    # Methods on objects
-    
-    AddIsEqualForObjects( homotopy_category,
-        function( obj1, obj2 )
-            return IsEqualForObjects( UnderlyingObject( obj1 ), UnderlyingObject( obj2 ) );
-        end );
-     
-    AddIsEqualForMorphisms( homotopy_category,
-        function( morphism1, morphism2 )
-        return is_equal_for_morphisms( UnderlyingMorphism( morphism1 ), UnderlyingMorphism( morphism2 ) );
-        end );
-        
-    # Methods on morphisms
-    AddPreCompose( homotopy_category, 
-        function( morphism1, morphism2 )
-        local morphism;
-        
-        morphism := PreCompose( UnderlyingMorphism( morphism1 ), UnderlyingMorphism( morphism2 ) );
-        
-        AddToToDoList( ToDoListEntry( [ [ morphism1, "UnderlyingReplacement" ], [ morphism2, "UnderlyingReplacement" ]  ],
-                                    function( )
-
-                                    if not HasUnderlyingReplacement( morphism ) then
-
-                                        SetUnderlyingReplacement( morphism, PreCompose( UnderlyingReplacement( morphism1 ), UnderlyingReplacement( morphism2 ) ) );
-
-                                    fi;
-
-                                    end ) );
-        return AsMorphismInHomotopyCategory( morphism );
-        
-        end );
     
     return homotopy_category;
     
@@ -140,4 +103,238 @@ InstallMethod( UnderlyingReplacement,
 
     return MorphismBetweenFibrantModels( MorphismBetweenCofibrantModels( UnderlyingMorphism( morphism ) ) );
 
+end );
+
+InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
+    function( homotopy_category )
+    local is_equal_for_morphisms, cat;
+    
+    cat := UnderlyingModelCategory( homotopy_category );
+    
+    if CanCompute( cat, "AreLeftHomotopic" ) then
+       is_equal_for_morphisms := 
+            function( morphism1, morphism2 )
+                return AreLeftHomotopic( morphism1, morphism2 );
+            end;
+    elif CanCompute( cat, "AreRightHomotopic" ) then
+       is_equal_for_morphisms := 
+            function( morphism1, morphism2 )
+                return AreRightHomotopic( morphism1, morphism2 );
+            end;
+    else
+        
+       is_equal_for_morphisms := ReturnTrue;
+       
+    fi;
+
+    # IsEqualForObjects
+    AddIsEqualForObjects( homotopy_category,
+        function( obj1, obj2 )
+            return IsEqualForObjects( UnderlyingObject( obj1 ), UnderlyingObject( obj2 ) );
+        end );
+    # IsEqualForMorphisms
+    AddIsEqualForMorphisms( homotopy_category,
+        function( morphism1, morphism2 )
+        return is_equal_for_morphisms( UnderlyingMorphism( morphism1 ), UnderlyingMorphism( morphism2 ) );
+        end );
+        
+    # Methods on morphisms
+    AddPreCompose( homotopy_category, 
+        function( morphism1, morphism2 )
+        local morphism;
+        
+        morphism := PreCompose( UnderlyingMorphism( morphism1 ), UnderlyingMorphism( morphism2 ) );
+        
+        AddToToDoList( ToDoListEntry( [ [ morphism1, "UnderlyingReplacement" ], [ morphism2, "UnderlyingReplacement" ]  ],
+                                    function( )
+
+                                    if not HasUnderlyingReplacement( morphism ) then
+
+                                        SetUnderlyingReplacement( morphism, PreCompose( UnderlyingReplacement( morphism1 ), UnderlyingReplacement( morphism2 ) ) );
+
+                                    fi;
+
+                                    end ) );
+
+        return AsMorphismInHomotopyCategory( morphism );        
+    end );
+
+    
+    ## IdentityMorphisms
+    AddIdentityMorphism( homotopy_category,
+
+      function( object )
+
+        return AsMorphismInHomotopyCategory( IdentityMorphism( UnderlyingObject( object ) ) );
+
+    end );
+
+    ## Addition for morphisms
+    AddAdditionForMorphisms( homotopy_category,
+
+      function( morphism1, morphism2 )
+        local sum;
+
+        sum := AdditionForMorphisms( UnderlyingMorphism( morphism1 ),
+                                     UnderlyingMorphism( morphism2 ) );
+
+        return AsMorphismInHomotopyCategory( sum );
+
+    end );
+
+    ## IsZeroForMorphisms
+    AddIsZeroForMorphisms( homotopy_category, 
+
+       function( morphism )
+       local underlying_mor;
+
+       underlying_mor := UnderlyingMorphism( morphism );
+
+       if HasIsZero( underlying_mor ) and IsZero( underlying_mor ) then
+
+          return true;
+
+       else 
+
+          return is_equal_for_morphisms( underlying_mor, ZeroMorphism( Source( underlying_mor ), Range( underlying_mor ) ) );
+
+       fi;
+
+    end );
+
+    ## IsZeroForObjects
+    AddIsZeroForObjects( homotopy_category, 
+
+    function( obj )
+    local underlying_obj;
+
+       underlying_obj := UnderlyingObject( obj );
+
+       if HasIsZero( underlying_obj ) and IsZero( underlying_obj ) then
+
+          return true;
+
+       else 
+
+          return IsZero( IdentityMorphism( obj ) );
+
+       fi;
+
+    end );
+
+    ## Additive inverse for morphisms
+    AddAdditiveInverseForMorphisms( homotopy_category,
+
+      function( morphism )
+        local new_mor;
+
+        new_mor := AdditiveInverseForMorphisms( UnderlyingMorphism( morphism ) );
+
+        return AsMorphismInHomotopyCategory( new_mor );
+
+    end );
+
+    ## Zero morphism
+    AddZeroMorphism( homotopy_category,
+
+      function( source, range )
+        local zero_mor;
+
+        zero_mor := ZeroMorphism( UnderlyingObject( source ), UnderlyingObject( range ) );
+
+        return AsMorphismInHomotopyCategory( zero_mor );
+
+    end );
+
+    ## Zero object
+    AddZeroObject( homotopy_category,
+
+      function( )
+        local zero_obj;
+        
+        zero_obj := ZeroObject( UnderlyingCategory( homotopy_category ) );
+        
+        return AsObjectInHomotopyCategory( zero_obj );
+        
+    end );
+    
+    ## 
+    
+    ## direct sum
+    AddDirectSum( homotopy_category,
+      
+      function( obj_list )
+        local underlying_list, underlying_sum;
+        
+        underlying_list := List( obj_list, UnderlyingObject );
+        
+        underlying_sum := CallFuncList( DirectSum, underlying_list );
+        
+        return AsObjectInHomotopyCategory( underlying_sum );
+        
+    end );
+    
+    AddDirectSumFunctorialWithGivenDirectSums( homotopy_category, 
+        function( source, L, range )
+        local maps, morphism;
+        
+        maps := List( L, i-> UnderlyingMorphism( i ) );
+        
+        morphism := DirectSumFunctorial( maps );
+        
+        return AsMorphismInHomotopyCategory( morphism );
+        
+    end );
+    
+    AddInjectionOfCofactorOfDirectSum( homotopy_category,
+        function( L, n )
+        local underlying_list, i;
+        
+        underlying_list := List( L, i-> UnderlyingObject( i ) );
+        
+        i := InjectionOfCofactorOfDirectSum( underlying_list, n );
+        
+        return AsMorphismInHomotopyCategory( i );
+        
+    end );
+    
+    AddProjectionInFactorOfDirectSum( homotopy_category,
+        function( L, n )
+        local underlying_list, i;
+        
+        underlying_list := List( L, i-> UnderlyingObject( i ) );
+        
+        i := ProjectionInFactorOfDirectSum( underlying_list, n );
+        
+        return AsMorphismInHomotopyCategory( i );
+        
+    end );
+    
+    AddUniversalMorphismIntoDirectSum( homotopy_category, 
+        function( objects_list, morphisms_list  )
+        local underlying_list, morphism;
+        
+        underlying_list := List( morphisms_list, i -> UnderlyingMorphism( i ) );
+        
+        morphism := UniversalMorphismIntoDirectSum( underlying_list );
+        
+        return AsMorphismInHomotopyCategory( morphism );
+        
+        end );
+    
+    AddUniversalMorphismFromDirectSum( homotopy_category, 
+        function( objects_list, morphisms_list )
+        local underlying_list, morphism;
+        
+        underlying_list := List( morphisms_list, i -> UnderlyingMorphism( i ) );
+        
+        morphism := UniversalMorphismFromDirectSum( underlying_list );
+        
+        return AsMorphismInHomotopyCategory( morphism );
+        
+        end );
+    
+        
+    
+    
 end );

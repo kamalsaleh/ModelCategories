@@ -26,6 +26,8 @@ DeclareCategory( "IsHomotopyCapCategoryMorphism", IsHomotopyCapCategoryCell and 
 
 DeclareAttribute( "HomotopyCategory", IsCapCategory and IsModelCategory );
 
+DeclareAttribute( "UnderlyingModelCategory", IsCapCategory );
+
 DeclareAttribute( "UnderlyingReplacement", IsHomotopyCapCategoryCell );
 
 DeclareAttribute( "UnderlyingObject", IsHomotopyCapCategoryObject );
@@ -36,3 +38,4 @@ DeclareAttribute( "AsObjectInHomotopyCategory", IsCapCategoryObject );
 
 DeclareAttribute( "AsMorphismInHomotopyCategory", IsCapCategoryMorphism );
 
+DeclareGlobalFunction( "INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES" );
