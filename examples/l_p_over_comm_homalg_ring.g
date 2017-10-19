@@ -6,7 +6,7 @@ LoadPackage( "ModelCategories" );
 R := HomalgRingOfIntegers( );;
 cat := LeftPresentations( R: FinalizeCategory := false );
 AddEpimorphismFromSomeProjectiveObject( cat, CoverByFreeModule );
-SetHasEnoughProjectives( cat, true );
+SetIsAbelianCategoryWithEnoughProjectives( cat, true );
 AddIsProjective( cat, function( P ) 
                       return not Lift( IdentityMorphism( P ), CoverByFreeModule( P ) ) = fail;
                       end );
