@@ -74,9 +74,35 @@ BindGlobal( "ModelStructureOnChainComplexes",
         return true;
         
         end );
-        
-  # See Homotopy theories and model categories of Dwyer and Spakinski.      
-  AddLifting( cat,
+
+# This can be derived, but it will be faster to state it here.
+AddIsFibrant( cat, 
+    function( obj )
+        return true;
+    end );
+
+# This can be derived, but it will be faster to state it here.
+AddAcyclicCofibrationIntoFibrantModel( cat, 
+    function( obj )
+        return IdentityMorphism( obj );
+    end );
+
+# This can be derived, but it will be faster to state it here.
+AddFibrantModel( cat, 
+    function( obj )
+        return obj;
+    end );
+    
+# This can be derived, but it will be faster to state it here.
+AddMorphismBetweenFibrantModels( cat, 
+    function( mor )
+        return mor;
+    end );
+    
+
+
+# See Homotopy theories and model categories of Dwyer and Spakinski.      
+AddLifting( cat,
     function( f, g, u, v )
     local l, A, B, P, splitting_morphism, direct_sum_to_B, direct_sum_to_X, B_to_direct_sum, X;
      
