@@ -128,6 +128,44 @@ InstallValue( MODEL_CATEGORIES_METHOD_NAME_RECORD, rec(
                    SetIsAcyclicFibration( return_value, true );
                    end ),
   
+    MorphismBetweenCofibrantModels := rec( 
+    installation_name := "MorphismBetweenCofibrantModels",
+    filter_list := [ "morphism" ],
+    cache_name := "MorphismBetweenCofibrantModels",
+    return_type := [ "morphism" ],
+    post_function :=  function( mor, return_value )
+
+                    AddToToDoList( 
+                        ToDoListEntry( [ [ mor, "IsWeakEquivalence" ] ], 
+                            function( )
+                            SetIsWeakEquivalence( return_value, IsWeakEquivalence( mor )  );
+                            end ) );
+                    AddToToDoList( 
+                        ToDoListEntry( [ [ return_value, "IsWeakEquivalence" ] ], 
+                            function( )
+                            SetIsWeakEquivalence( mor, IsWeakEquivalence( mor )  );
+                            end ) );
+                    end ),
+    
+    MorphismBetweenFibrantModels := rec( 
+    installation_name := "MorphismBetweenFibrantModels",
+    filter_list := [ "morphism" ],
+    cache_name := "MorphismBetweenFibrantModels",
+    return_type := [ "morphism" ],
+    post_function :=  function( mor, return_value )
+
+                    AddToToDoList( 
+                        ToDoListEntry( [ [ mor, "IsWeakEquivalence" ] ], 
+                            function( )
+                            SetIsWeakEquivalence( return_value, IsWeakEquivalence( mor )  );
+                            end ) );
+                    AddToToDoList( 
+                        ToDoListEntry( [ [ return_value, "IsWeakEquivalence" ] ], 
+                            function( )
+                            SetIsWeakEquivalence( mor, IsWeakEquivalence( mor )  );
+                            end ) );
+                    end ),
+  
   AreLeftHomotopic := rec(
   installation_name := "AreLeftHomotopic",
   filter_list := [ "morphism", "morphism" ],
@@ -181,49 +219,4 @@ InstallImmediateMethod( INSTALL_LOGICAL_IMPLICATIONS_AND_THEOREMS_FOR_MODEL_CATE
      
     TryNextMethod( );
      
-end );
-
-##
-##
-InstallMethod( MorphismBetweenCofibrantModels,
-               [ IsCapCategoryMorphism ],
-    function( morphism )
-    local g, u, v, f;
-    
-    g := AcyclicFibrationFromCofibrantModel( Range( morphism ) );
-    
-    u := UniversalMorphismFromInitialObject( Source( g ) );
-    
-    v := PreCompose( AcyclicFibrationFromCofibrantModel( Source( morphism ) ), morphism );
-    
-    f := UniversalMorphismFromInitialObject( CofibrantModel( Source( morphism ) ) );
-    
-    Assert( 5, IsCofibration( f ) );
-    
-    SetIsCofibration( f, true );
-    
-    return Lifting( f, g, u, v );
-    
-    end );
-    
-##
-InstallMethod( MorphismBetweenFibrantModels,
-               [ IsCapCategoryMorphism ],
-    function( morphism )
-    local g, u, v, f;
-    
-    f := AcyclicCofibrationIntoFibrantModel( Source( morphism ) );
-    
-    v := UniversalMorphismIntoTerminalObject( Range( f ) );
-    
-    u := PreCompose( morphism, AcyclicCofibrationIntoFibrantModel( Range( morphism ) ) );
-    
-    g := UniversalMorphismIntoTerminalObject( Range( u ) );
-    
-    Assert( 5, IsFibration( g ) );
-    
-    SetIsFibration( g, true );
-    
-    return Lifting( f, g, u, v );
-    
 end );

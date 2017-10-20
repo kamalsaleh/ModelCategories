@@ -193,3 +193,56 @@ AddDerivationToCAP( AcyclicFibrationFromCofibrantModel,
     fi;
 
 end : Description := "constructs an acyclic fibration from a cofibrant model for the given obj" );
+
+##
+AddDerivationToCAP( MorphismBetweenCofibrantModels, 
+            [ [ AcyclicFibrationFromCofibrantModel, 1 ], 
+              [ CofibrantModel, 1 ],
+              [ Lifting, 1 ],
+              [ UniversalMorphismFromInitialObject, 1 ] ], 
+            
+    function( mor )
+    local g, u, v, f;
+    
+    g := AcyclicFibrationFromCofibrantModel( Range( mor ) );
+    
+    u := UniversalMorphismFromInitialObject( Source( g ) );
+    
+    v := PreCompose( AcyclicFibrationFromCofibrantModel( Source( mor ) ), mor );
+    
+    f := UniversalMorphismFromInitialObject( CofibrantModel( Source( mor ) ) );
+    
+    Assert( 5, IsCofibration( f ) );
+    
+    SetIsCofibration( f, true );
+    
+    return Lifting( f, g, u, v );
+
+end : Description := "constructs an mor between cofibrant models of source and range of a mor " );
+
+##
+AddDerivationToCAP( MorphismBetweenFibrantModels, 
+            [ [ AcyclicCofibrationIntoFibrantModel, 1 ], 
+              [ FibrantModel, 1 ],
+              [ Lifting, 1 ],
+              [ UniversalMorphismIntoTerminalObject, 1 ] ], 
+            
+    function( mor )
+    local g, u, v, f;
+
+    f := AcyclicCofibrationIntoFibrantModel( Source( mor ) );
+    
+    v := UniversalMorphismIntoTerminalObject( Range( f ) );
+    
+    u := PreCompose( mor, AcyclicCofibrationIntoFibrantModel( Range( mor ) ) );
+    
+    g := UniversalMorphismIntoTerminalObject( Range( u ) );
+    
+    Assert( 5, IsFibration( g ) );
+    
+    SetIsFibration( g, true );
+    
+    return Lifting( f, g, u, v );
+
+end : Description := "constructs an morphism between fibrant models of source and range of a morphism " );
+

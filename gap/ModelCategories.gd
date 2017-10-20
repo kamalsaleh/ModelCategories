@@ -239,9 +239,35 @@ DeclareOperation( "AddCofibrantModel",
 DeclareOperation( "AddCofibrantModel",
                   [ IsCapCategory, IsList ] );
 
+##
 DeclareAttribute( "MorphismBetweenCofibrantModels", IsCapCategoryMorphism );
 
+DeclareOperation( "AddMorphismBetweenCofibrantModels",
+                  [ IsCapCategory, IsFunction ] );
+
+DeclareOperation( "AddMorphismBetweenCofibrantModels",
+                  [ IsCapCategory, IsFunction, IsInt ] );
+
+DeclareOperation( "AddMorphismBetweenCofibrantModels",
+                  [ IsCapCategory, IsList, IsInt ] );
+
+DeclareOperation( "AddMorphismBetweenCofibrantModels",
+                  [ IsCapCategory, IsList ] );
+
+##
 DeclareAttribute( "MorphismBetweenFibrantModels", IsCapCategoryMorphism );
+
+DeclareOperation( "AddMorphismBetweenFibrantModels",
+                  [ IsCapCategory, IsFunction ] );
+
+DeclareOperation( "AddMorphismBetweenFibrantModels",
+                  [ IsCapCategory, IsFunction, IsInt ] );
+
+DeclareOperation( "AddMorphismBetweenFibrantModels",
+                  [ IsCapCategory, IsList, IsInt ] );
+
+DeclareOperation( "AddMorphismBetweenFibrantModels",
+                  [ IsCapCategory, IsList ] );
 
 ##
 DeclareOperation( "AreLeftHomotopic", [ IsCapCategoryMorphism, IsCapCategoryMorphism ] );
