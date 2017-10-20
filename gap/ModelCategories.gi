@@ -10,12 +10,6 @@ InstallValue( CAP_INTERNAL_MODEL_CATEGORIES_BASIC_OPERATIONS, rec( ) );
 InstallValue( MODEL_CATEGORIES_METHOD_NAME_RECORD, rec(
 
 ## Basic Operations for Model Categories
-  
-  ProjectiveLift := rec( 
-  installation_name := "ProjectiveLift",
-  filter_list := [ "morphism", "morphism" ],
-  cache_name := "ProjectiveLift",
-  return_type := [ "morphism" ] ),
 
   IsWeakEquivalence := rec(
   installation_name := "IsWeakEquivalence",
