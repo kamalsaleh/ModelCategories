@@ -245,7 +245,18 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
         return AsMorphismInHomotopyCategory( zero_mor );
 
     end );
-
+    
+    ## isomorphism
+    AddIsIsomorphism( homotopy_category,
+        function( mor )
+        if HasUnderlyingMorphism( mor ) then
+            return IsWeakEquivalence( UnderlyingMorphism( mor ) );
+        else
+        
+            return IsWeakEquivalence( UnderlyingReplacement( mor ) );
+        fi;
+        end );
+         
     ## Zero object
     AddZeroObject( homotopy_category,
 
