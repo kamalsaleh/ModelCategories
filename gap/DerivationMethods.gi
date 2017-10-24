@@ -202,7 +202,7 @@ AddDerivationToCAP( MorphismBetweenCofibrantModels,
               [ UniversalMorphismFromInitialObject, 1 ] ], 
             
     function( mor )
-    local g, u, v, f;
+    local g, u, v, f, l;
     
     g := AcyclicFibrationFromCofibrantModel( Range( mor ) );
     
@@ -216,8 +216,18 @@ AddDerivationToCAP( MorphismBetweenCofibrantModels,
     
     SetIsCofibration( f, true );
     
-    return Lifting( f, g, u, v );
+    l := Lifting( f, g, u, v );
 
+    Assert( 5, IsCofibrant( Source( l ) ) );
+    
+    SetIsCofibrant( Source( l ), true );
+    
+    Assert( 5, IsCofibrant( Range( l ) ) );
+    
+    SetIsCofibrant( Range( l ), true );
+    
+    return l;
+    
 end : Description := "constructs an mor between cofibrant models of source and range of a mor " );
 
 ##
@@ -228,7 +238,7 @@ AddDerivationToCAP( MorphismBetweenFibrantModels,
               [ UniversalMorphismIntoTerminalObject, 1 ] ], 
             
     function( mor )
-    local g, u, v, f;
+    local g, u, v, f, l;
 
     f := AcyclicCofibrationIntoFibrantModel( Source( mor ) );
     
@@ -241,8 +251,18 @@ AddDerivationToCAP( MorphismBetweenFibrantModels,
     Assert( 5, IsFibration( g ) );
     
     SetIsFibration( g, true );
-    
-    return Lifting( f, g, u, v );
 
+    l := Lifting( f, g, u, v );
+
+    Assert( 5, IsFibrant( Source( l ) ) );
+    
+    SetIsFibrant( Source( l ), true );
+    
+    Assert( 5, IsFibrant( Range( l ) ) );
+    
+    SetIsFibrant( Range( l ), true );
+    
+    return l;
+    
 end : Description := "constructs an morphism between fibrant models of source and range of a morphism " );
 
