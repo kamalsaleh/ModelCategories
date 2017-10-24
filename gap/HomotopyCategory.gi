@@ -256,11 +256,42 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
             return IsWeakEquivalence( UnderlyingReplacement( mor ) );
         fi;
         end );
+        
+    ## Inverse
+     AddInverse( homotopy_category, 
+         function( mor )
+         local f, A, B, q, p, C, r, s, sr;
+         
+         f := UnderlyingReplacement( mor );
+         
+         A := Source( f );
+         
+         B := Range( f );
+         
+         q := FactorThroughAcyclicCofibration( f )[ 1 ];
+         
+         p := FactorThroughAcyclicCofibration( f )[ 2 ];
+ 
+         C := Range( q );
+         
+         Assert( 5, IsWeakEquivalence( p ) );
+         
+         # Axiom
+         SetIsWeakEquivalence( p, true );
+         
+         r := Lifting( q, UniversalMorphismIntoTerminalObject( A ), IdentityMorphism( A ), UniversalMorphismIntoTerminalObject( C ) );
+         
+         s := Lifting( UniversalMorphismFromInitialObject( B ), p, UniversalMorphismFromInitialObject( C ), IdentityMorphism( B ) );
+         
+         # this is wrong, the output here is not in the correct category
+         return PreCompose( s, r );
+         
+         end );
          
     ## Zero object
     AddZeroObject( homotopy_category,
 
-      function( )
+        function( )
         local zero_obj;
         
         zero_obj := ZeroObject( UnderlyingCategory( homotopy_category ) );
