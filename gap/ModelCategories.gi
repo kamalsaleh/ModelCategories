@@ -83,13 +83,21 @@ InstallValue( MODEL_CATEGORIES_METHOD_NAME_RECORD, rec(
   installation_name := "FactorThroughAcyclicFibration",
   filter_list := [ "morphism" ],
   cache_name := "FactorThroughAcyclicFibration",
-  return_type := [ "morphism", "morphism" ] ),
+  return_type := [ "morphism", "morphism" ],
+  post_function :=  function( mor, return_value )
+                    SetIsCofibration( return_value[ 1 ], true );
+                    SetIsAcyclicFibration( return_value[ 2 ], true );
+                    end ),
 
   FactorThroughAcyclicCofibration := rec(
   installation_name := "FactorThroughAcyclicCofibration",
   filter_list := [ "morphism" ],
   cache_name := "FactorThroughAcyclicCofibration",
-  return_type := [ "morphism", "morphism" ] ),
+  return_type := [ "morphism", "morphism" ],
+  post_function :=  function( mor, return_value )
+                    SetIsAcyclicCofibration( return_value[ 1 ], true );
+                    SetIsFibration( return_value[ 2 ], true );
+                    end ),
   
   FibrantModel := rec(
   installation_name := "FibrantModel",
@@ -128,7 +136,10 @@ InstallValue( MODEL_CATEGORIES_METHOD_NAME_RECORD, rec(
     cache_name := "MorphismBetweenCofibrantModels",
     return_type := [ "morphism" ],
     post_function :=  function( mor, return_value )
-
+                    SetIsCofibrant( Source( return_value ), true );
+                    
+                    SetIsCofibrant( Range( return_value ), true );
+                    
                     AddToToDoList( 
                         ToDoListEntry( [ [ mor, "IsWeakEquivalence" ] ], 
                             function( )
@@ -148,6 +159,10 @@ InstallValue( MODEL_CATEGORIES_METHOD_NAME_RECORD, rec(
     return_type := [ "morphism" ],
     post_function :=  function( mor, return_value )
 
+                    SetIsFibrant( Source( return_value ), true );
+                    
+                    SetIsFibrant( Range( return_value ), true );
+                    
                     AddToToDoList( 
                         ToDoListEntry( [ [ mor, "IsWeakEquivalence" ] ], 
                             function( )
