@@ -33,7 +33,7 @@ InstallMethod( HomotopyCategory,
     function( cat )
     local homotopy_category, to_be_finalized;
     
-    homotopy_category := CreateCapCategory( Concatenation( "Homotopy homotopy_category of ", Big_to_Small( Name( cat ) ) ) );
+    homotopy_category := CreateCapCategory( Concatenation( "Homotopy category of ", Big_to_Small( Name( cat ) ) ) );
 
     SetUnderlyingModelCategory( homotopy_category, cat );
     
