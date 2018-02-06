@@ -88,6 +88,30 @@ InstallMethod( AsMorphismInHomotopyCategory,
 end );
 
 ##
+InstallMethod( AsMorphismInHomotopyCategoryByReplacement, 
+               [ IsCapCategoryObject, IsCapCategoryMorphism, IsCapCategoryObject ],
+    function( M, morphism, N )
+    local phi;
+    
+    if not IsEqualForObjects( Source( morphism ), FibrantModel( CofibrantModel( M ) ) ) or
+        not IsEqualForObjects( Range( morphism ), FibrantModel( CofibrantModel( N ) ) ) then
+            Error( "Input is not compatible" );
+    fi;
+    
+    phi := rec( );
+    
+    ObjectifyWithAttributes( phi, TheTypeOfHomotopyCapCategoryMorphism,
+                             UnderlyingReplacement, morphism,
+                             Source, AsObjectInHomotopyCategory( M ),
+                             Range, AsObjectInHomotopyCategory( N )  );
+    
+    AddMorphism( HomotopyCategory( CapCategory( morphism ) ), phi );
+    
+    return phi;
+    
+end );
+
+##
 InstallMethod( UnderlyingReplacement,
                [ IsHomotopyCapCategoryCell and IsCapCategoryObject ],
     function( obj )
@@ -284,7 +308,8 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
          s := Lifting( UniversalMorphismFromInitialObject( B ), p, UniversalMorphismFromInitialObject( C ), IdentityMorphism( B ) );
          
          # this is wrong, the output here is not in the correct category
-         return PreCompose( s, r );
+         # corrected, but there is maybe a better way ..
+         return AsMorphismInHomotopyCategoryByReplacement( UnderlyingObject( Range( mor ) ), PreCompose( s, r ), UnderlyingObject( Source( mor ) ) );
          
          end );
          

@@ -38,4 +38,6 @@ DeclareAttribute( "AsObjectInHomotopyCategory", IsCapCategoryObject );
 
 DeclareAttribute( "AsMorphismInHomotopyCategory", IsCapCategoryMorphism );
 
+DeclareOperation( "AsMorphismInHomotopyCategoryByReplacement", [ IsCapCategoryObject, IsCapCategoryMorphism, IsCapCategoryObject ] );
+
 DeclareGlobalFunction( "INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES" );
