@@ -187,9 +187,10 @@ AddLifting( cat,
       
       cyl_f_to_cone_f := NaturalMorphismFromMappingCylinderInMappingCone( f );
       
-      P_to_cone_f := QuasiIsomorphismFromProjectiveResolution( MappingCone( f ) );
+      ## Here we need the upper bound of the projective resolution, hence we try the first 5000 indeces
+      P := ProjectiveResolutionWithBounds( MappingCone( f ), 5000 );
       
-      P := Source( P_to_cone_f );
+      P_to_cone_f := QuasiIsomorphismFromProjectiveResolution( MappingCone( f ) );
       
       A_to_cyl_f := NaturalInjectionOfSourceInMappingCylinder( f );
       
@@ -214,7 +215,7 @@ AddLifting( cat,
       
     AddFactorThroughAcyclicCofibration( cat,
       function( f )
-      local A, B, cocyl_f_to_B, A_to_cocyl_f, cocyl_f_to_M, P_to_M, P, i, R_to_cocyl_f, j;
+      local A, B, cocyl_f_to_B, A_to_cocyl_f, cocyl_f_to_M, P_to_M, P, i, R_to_cocyl_f, j, M;
       
       A := Source( f );
       
@@ -226,9 +227,11 @@ AddLifting( cat,
       
       cocyl_f_to_M := CokernelProjection( A_to_cocyl_f );
       
-      P_to_M := QuasiIsomorphismFromProjectiveResolution( CokernelObject( A_to_cocyl_f ) );
+      M := CokernelObject( A_to_cocyl_f );
       
-      P := Source( P_to_M );
+      P := ProjectiveResolutionWithBounds( M, 5000 );
+      
+      P_to_M := QuasiIsomorphismFromProjectiveResolution( M );
       
       ##
       i := UniversalMorphismIntoFiberProduct( [ cocyl_f_to_M, P_to_M ], [ A_to_cocyl_f, ZeroMorphism( A, P ) ] );
