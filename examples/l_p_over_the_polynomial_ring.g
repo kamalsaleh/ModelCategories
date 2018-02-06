@@ -18,9 +18,8 @@ AddAreLeftHomotopic( chains,
     function( phi, psi )
         return is_left_homotopic_to_null( phi - psi );
     end );
-CapCategorySwitchLogicOff( chains );
+#CapCategorySwitchLogicOff( chains );
 Finalize( chains );
-
 
 m := HomalgMatrix( "[ x,y,0,z,-x,y ]", 2, 3, R );
 # <A 2 x 3 matrix over an external ring>
@@ -32,22 +31,20 @@ M := AsLeftPresentation( m );
 # <An object in Category of left presentations of Q[x,y,z]>
 N := AsLeftPresentation( n );
 # <An object in Category of left presentations of Q[x,y,z]>
-phi := PresentationMorphism( M, a, N );
+f1 := PresentationMorphism( M, a, N );
 # <A morphism in Category of left presentations of Q[x,y,z]>
-M := StalkChainComplex( M, 1 );
+CM := StalkChainComplex( M, 1 );
 # <A bounded object in chain complexes category over category of left presentations of Q[x,y,z] with active lower bound 0 and active upper bound 2>
-N := StalkChainComplex( N, 1 );
+CN := StalkChainComplex( N, 1 );
 # <A bounded object in chain complexes category over category of left presentations of Q[x,y,z] with active lower bound 0 and active upper bound 2>
-phi := ChainMorphism( M, N, [ phi ], 1 );
+phi := ChainMorphism( CM, CN, [ f1 ], 1 );
 # <A bounded morphism in chain complexes category over category of left presentations of Q[x,y,z] with active lower bound 0 and active upper bound 2>
-M_cofib := CofibrantModel( M );
-# <A bounded object in chain complexes category over category of left presentations of Q[x,y,z] with active lower bound 0 and active upper bound 3>
-N_cofib := CofibrantModel( N );
-# <A bounded object in chain complexes category over category of left presentations of Q[x,y,z] with active lower bound 0 and active upper bound 5>
-phi_cofib := MorphismBetweenCofibrantModels( phi );
-# <A bounded morphism in chain complexes category over category of left presentations of Q[x,y,z] with active lower bound 0 and active upper bound 3>
 IsWellDefined( phi );
 # true
+CM_cofib := CofibrantModel( CM );
+# <A bounded object in chain complexes category over category of left presentations of Q[x,y,z] with active lower bound 0 and active upper bound 3>
+CN_cofib := CofibrantModel( CN );
+# <A bounded object in chain complexes category over category of left presentations of Q[x,y,z] with active lower bound 0 and active upper bound 5>
 phi_cofib := MorphismBetweenCofibrantModels( phi );
 # <A bounded morphism in chain complexes category over category of left presentations of Q[x,y,z] with active lower bound 0 and active upper bound 3>
 IsWellDefined( phi_cofib, 0, 10 );
@@ -144,13 +141,7 @@ Display( phi_cofib, 0, 10 );
 # A zero, split monomorphism in Category of left presentations of Q[x,y,z]
 # 
 # -----------------------------------------------------------------
-M_cofib := CofibrantModel( M );
-# <A bounded object in chain complexes category over category of left presentations of Q[x,y,z] with active lower bound 0 and active upper bound 3>
-N_cofib := CofibrantModel( N );
-# <A bounded object in chain complexes category over category of left presentations of Q[x,y,z] with active lower bound 0 and active upper bound 5>
-phi_cofib;
-# <A bounded morphism in chain complexes category over category of left presentations of Q[x,y,z] with active lower bound 0 and active upper bound 3>
-H := InternalHomOnObjects( M_cofib, N_cofib );
+H := InternalHomOnObjects( CM_cofib, CN_cofib );
 # <A bounded object in chain complexes category over category of left presentations of Q[x,y,z] with active lower bound -2 and active upper bound 4>
 kernel_mor_of_H := CyclesAt( H, 0 );
 # <A monomorphism in Category of left presentations of Q[x,y,z]>
@@ -175,7 +166,7 @@ T := TensorUnit( chains );
 morphisms_from_T_to_H := List( morphisms_from_R_to_kernel, m -> ChainMorphism( T, H, [ PreCompose( m, kernel_mor_of_H) ], 0 ) );;
 List( morphisms_from_T_to_H, IsWellDefined );
 # [ true, true, true, true, true, true, true, true, true, true, true, true, true, true ]
-morphisms_between_M_cofib_N_cofib := List( morphisms_from_T_to_H, m-> InternalHomToTensorProductAdjunctionMap( M_cofib, N_cofib, m ) );;
+morphisms_between_M_cofib_N_cofib := List( morphisms_from_T_to_H, m-> InternalHomToTensorProductAdjunctionMap( CM_cofib, CN_cofib, m ) );;
 morphisms_between_M_cofib_N_cofib_homotopy_cat := List( morphisms_between_M_cofib_N_cofib, AsMorphismInHomotopyCategory );;
 List( morphisms_between_M_cofib_N_cofib, IsZero );
 # [ false, false, false, false, false, false, false, false, false, false, false, false, false, false ]
@@ -235,4 +226,3 @@ Display( morphisms_between_M_cofib_N_cofib[ 10 ], 0, 5 );
 # A zero, isomorphism in Category of left presentations of Q[x,y,z]
 # 
 # -----------------------------------------------------------------
-#
