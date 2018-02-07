@@ -5,7 +5,7 @@ LoadPackage( "ModelCategories" );
  vec_spaces := MatrixCategory( Q: FinalizeCategory := false );
  AddIsProjective( vec_spaces, ReturnTrue );
  AddEpimorphismFromSomeProjectiveObject( vec_spaces, IdentityMorphism );
- SetHasEnoughProjectives( vec_spaces, true );
+ SetIsAbelianCategoryWithEnoughProjectives( vec_spaces, true );
  Finalize( vec_spaces );
 
  chains := ChainComplexCategory( vec_spaces : FinalizeCategory := false );
