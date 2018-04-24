@@ -22,30 +22,40 @@ AddAreLeftHomotopic( chains,
     end );
 Finalize( chains );
 
-# The functor: __ tensor Z/<6>
-Tensor_product_with_Z6 := CapFunctor( "Tensor product with Z/<6>", cat, cat );
-AddObjectFunction( Tensor_product_with_Z6, 
+# The functor: __ tensor M
+
+tensor_functor := function( M )
+local Tensor_product_with_M;
+Tensor_product_with_M := CapFunctor( "Tensor product functor", cat, cat );
+AddObjectFunction( Tensor_product_with_M, 
     function( obj )
-    return TensorProductOnObjects( obj, Z6 );
+    return TensorProductOnObjects( obj, M );
     end );
-AddMorphismFunction( Tensor_product_with_Z6, 
+AddMorphismFunction( Tensor_product_with_M, 
     function( obj1, mor, obj2 )
-    return TensorProductOnMorphisms( mor, IdentityMorphism( Z6 ) );
+    return TensorProductOnMorphisms( mor, IdentityMorphism( M ) );
     end );
+return Tensor_product_with_M;
+end;
     
 # The functor: Hom( __, Z/<6> ) as covariant functor
-Hom_Obj_Z6 := CapFunctor( "Hom(_,ZZ/<6>) functor", Opposite( cat ), cat );
-AddObjectFunction( Hom_Obj_Z6,
-    function( obj )
-    return InternalHomOnObjects( Opposite( obj ), Z6 );
-    end );
-AddMorphismFunction( Hom_Obj_Z6,
-    function( obj1, mor, obj2 )
-    return InternalHomOnMorphisms( Opposite( mor ), IdentityMorphism( Z6 ) );
-    end );
 
-Tensor_product_with_Z6_in_chains := ExtendFunctorToChainComplexCategoryFunctor( Tensor_product_with_Z6 );
-Hom_Obj_Z6_from_cochains_to_cochains := ExtendFunctorToCochainComplexCategoryFunctor( Hom_Obj_Z6 );
+hom_functor := function( M )
+local Hom_Obj_M;
+Hom_Obj_M := CapFunctor( "Hom(_,M) functor", Opposite( cat ), cat );
+AddObjectFunction( Hom_Obj_M,
+    function( obj )
+    return InternalHomOnObjects( Opposite( obj ), M );
+    end );
+AddMorphismFunction( Hom_Obj_M,
+    function( obj1, mor, obj2 )
+    return InternalHomOnMorphisms( Opposite( mor ), IdentityMorphism( M ) );
+    end );
+return Hom_Obj_M;
+end;
+
+Tensor_product_with_Z6_in_chains := ExtendFunctorToChainComplexCategoryFunctor( tensor_functor( Z6 ) );
+Hom_Obj_Z6_from_cochains_to_cochains := ExtendFunctorToCochainComplexCategoryFunctor( hom_functor( Z6) );
 Hom_Obj_Z6_from_chains_to_cochains := 
     PreCompose( ChainCategoryToCochainCategoryOfOppositeCategory( cat ), Hom_Obj_Z6_from_cochains_to_cochains );
 
@@ -90,7 +100,6 @@ ext_1 := CohomologyAt( hom_applied_on_proj_res_of_Z4, 1 );;
 # 
 # An object in Category of left presentations of Z
 
-quit;
 
 A := FreeLeftPresentation( 1, ZZ );
 id_A := IdentityMorphism( A );
