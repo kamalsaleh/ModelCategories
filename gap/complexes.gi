@@ -26,7 +26,7 @@ BindGlobal( "ModelStructureOnChainComplexes",
     fi;
         
       
-    for i in [ 0 .. Maximum( ActiveUpperBound( A ), ActiveUpperBound( B ) ) ] do 
+    for i in [ Minimum( ActiveLowerBound( A ), ActiveLowerBound( B ) ) .. Maximum( ActiveUpperBound( A ), ActiveUpperBound( B ) ) ] do 
           
         if not IsMonomorphism( phi[ i ] ) then 
           
@@ -61,7 +61,7 @@ BindGlobal( "ModelStructureOnChainComplexes",
         
     fi;
     
-    for i in [ 1 .. Maximum( ActiveUpperBound( A ), ActiveUpperBound( B ) ) ] do 
+    for i in [ Minimum( ActiveLowerBound( A ), ActiveLowerBound( B ) ) .. Maximum( ActiveUpperBound( A ), ActiveUpperBound( B ) ) ] do 
         
         if not IsEpimorphism( phi[ i ] ) then 
             
