@@ -7,7 +7,7 @@ R := HomalgFieldOfRationalsInSingular( )*"x,y,z";;
 cat := LeftPresentations( R: FinalizeCategory := false );
 #! Category of left presentations of Q[x,y,z]
 AddEpimorphismFromSomeProjectiveObject( cat, CoverByFreeModule );
-SetHasEnoughProjectives( cat, true );
+SetIsAbelianCategoryWithEnoughProjectives( cat, true );
 AddIsProjective( cat, function( P ) 
                       return not Lift( IdentityMorphism( P ), CoverByFreeModule( P ) ) = fail;
                       end );
