@@ -36,16 +36,15 @@ BindGlobal( "ModelStructureOnChainComplexes",
           
         if not IsProjective( CokernelObject( phi[ i ] ) ) then
              
-             
             return false;
-             
+            
         fi;
           
-      od;
-      
-      return true;
-      
-      end );
+    od;
+    
+    return true;
+    
+    end );
     
   AddIsFibration( cat, 
     function( phi )
@@ -71,15 +70,12 @@ BindGlobal( "ModelStructureOnChainComplexes",
             
     od;
         
-        return true;
-        
-        end );
+    return true;
+    
+    end );
 
 # This can be derived, but it will be faster to state it here.
-AddIsFibrant( cat, 
-    function( obj )
-        return true;
-    end );
+AddIsFibrant( cat, ReturnTrue );
 
 # This can be derived, but it will be faster to state it here.
 AddAcyclicCofibrationIntoFibrantModel( cat, 
@@ -245,7 +241,7 @@ AddLifting( cat,
       ##
       j := PreCompose( R_to_cocyl_f, cocyl_f_to_B );
       Assert( 5, IsFibration( j ) );
-      #SetIsFibration( j, true );
+      SetIsFibration( j, true );
       
       return [ i, j ];
       
