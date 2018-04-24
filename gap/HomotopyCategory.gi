@@ -147,7 +147,7 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
             end;
     else
         
-       is_equal_for_morphisms := ReturnTrue;
+        Error( "We can not decide equality between two morphisms" );
        
     fi;
 
@@ -400,8 +400,5 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
         return AsMorphismInHomotopyCategory( morphism );
         
         end );
-    
-        
-    
     
 end );
