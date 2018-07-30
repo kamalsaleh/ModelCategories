@@ -341,6 +341,30 @@ compute_homotopy_chain_morphisms_for_null_homotopic_morphism :=
     # Here: l[n]: B[n] --> C[n+1], n in Z.
 end;
 
+BeilinsonQuiverWithRelations := function( field, n )
+local i,j,u,v,arrows,kQ,AQ,Q;
+u := "";
+for i in [ 1 .. n ] do
+for j in [ 0 .. n ] do
+u := Concatenation( u,"x",String(i),String(j),":",String(i),"->",String(i+1),"," );
+od;
+od;
+Remove( u, Length( u ) );
+u := Concatenation( "Q(", String(n+1),")[",u,"]" );
+Q := RightQuiver( u );
+arrows := Arrows( Q );
+kQ := PathAlgebra( field, Q );
+v := [ ];
+for i in [ 1 .. n-1 ] do
+for j in Combinations( [ 0 .. n ], 2 ) do
+Add( v, kQ.(Concatenation( "x", String(i),String(j[1])) )* kQ.(Concatenation( "x", String(i+1),String(j[2]) ) )-
+        kQ.(Concatenation( "x",String(i),String(j[2]) ) )* kQ.(Concatenation( "x", String(i+1),String(j[1]) ) ) );
+od;
+od;
+AQ := QuotientOfPathAlgebra( kQ, v );
+return [Q,kQ,AQ];
+end;
+
 ########################################################
 quit;
 k := Rationals;
@@ -424,6 +448,18 @@ List( L, l -> IsNullHomotopic( PreCompose( l, NaturalInjectionInMappingCone( l )
 #  1 ---  x11 ---> 2 --- x21 ---> 3
 #         x12            x22
 
-# Q := RightQuiver("Q(3)[x10:1->2, x11:1->2, x12:1->2,x20:2->3, x21:2->3, x22:2->3 ]" );
-# kQ := PathAlgebra( k, Q );
-# AQ := QuotientOfPathAlgebra( kQ, [ kQ.x10*kQ.x21 - kQ.x11*kQ.x20, etc ] );
+#Q := RightQuiver( "Q(3)[x10:1->2,x11:1->2,x12:1->2,x20:2->3,x21:2->3,x22:2->3]" );
+#kQ := PathAlgebra( k, Q );
+#AQ := QuotientOfPathAlgebra( kQ, [ kQ.x10*kQ.x21-kQ.x11*kQ.x20,kQ.x10*kQ.x22-kQ.x12*kQ.x20,kQ.x11*kQ.x22-kQ.x12*kQ.x21 ] );
+
+# or
+
+P := BeilinsonQuiverWithRelations( Rationals, 2 );;
+
+Q := P[1];
+# Q(3)[x10:1->2,x11:1->2,x12:1->2,x20:2->3,x21:2->3,x22:2->3]
+kQ := P[2];
+# Rationals * Q
+AQ := P[3];
+# (Rationals * Q) / [ -1*(x11*x20) + 1*(x10*x21), -1*(x12*x20) + 1*(x10*x22), -1*(x12*x21) + 1*(x11*x22) ]
+
