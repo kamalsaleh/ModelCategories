@@ -1,8 +1,9 @@
 
-Read( "/home/saleh/Documents/gap_packages/local/pkg/ModelCategories/examples/left_homotopy_in_complexes_of_l_p_over_comm_homalg_ring.g" );
+Read( "left_homotopy_in_complexes_of_l_p_over_comm_homalg_ring.g" );
 
 LoadPackage( "ModulePresentations" );
 LoadPackage( "ModelCategories" );
+LoadPackage( "TriangulatedCategoriesForCAP" );
 
 R := HomalgFieldOfRationalsInSingular()*"x,y,z";;
 cat := LeftPresentations( R: FinalizeCategory := false );
