@@ -22,6 +22,128 @@ AddAreLeftHomotopic( chains,
 #CapCategorySwitchLogicOff( chains );
 Finalize( chains );
 
+twist_functor := ShiftFunctor( chains, -1 );
+reverse_twist_functor := ShiftFunctor( chains, 1 );
+
+homotopy_chains := HomotopyCategory( chains );
+SetIsTriangulatedCategory( homotopy_chains, true );
+
+## Adding the shift and reverse shift functors
+AddShiftOfObject( homotopy_chains, 
+    function( C )
+    local replacement;
+    replacement := UnderlyingReplacement( C );
+    return AsObjectInHomotopyCategory( ApplyFunctor( twist_functor, replacement )  );
+end );
+
+##
+AddShiftOfMorphism( homotopy_chains, 
+    function( phi )
+    local replacement;
+    replacement := UnderlyingReplacement( phi );
+    return AsMorphismInHomotopyCategory( ApplyFunctor( twist_functor, replacement ) );
+end );
+
+##
+AddReverseShiftOfObject( homotopy_chains, 
+    function( C )
+    local replacement;
+    replacement := UnderlyingReplacement( C );
+    return AsObjectInHomotopyCategory( ApplyFunctor( reverse_twist_functor, replacement )  );
+end );
+
+##
+AddReverseShiftOfMorphism( homotopy_chains, 
+    function( phi )
+    local replacement;
+    replacement := UnderlyingReplacement( phi );
+    return AsMorphismInHomotopyCategory( ApplyFunctor( reverse_twist_functor, replacement ) );
+end );
+
+##
+AddIsomorphismIntoShiftOfReverseShift( homotopy_chains,
+    function( C )
+    local replacement;
+    replacement := UnderlyingReplacement( C );
+    return AsMorphismInHomotopyCategoryByReplacement( 
+        UnderlyingObject( C ),
+        IdentityMorphism( replacement ),
+        UnderlyingReplacement( C )
+    );
+end );
+
+AddIsomorphismFromShiftOfReverseShift( homotopy_chains,
+    function( C )
+    local replacement;
+    replacement := UnderlyingReplacement( C );
+    return AsMorphismInHomotopyCategoryByReplacement( 
+        UnderlyingReplacement( C ),
+        IdentityMorphism( replacement ),
+        UnderlyingObject( C )
+    );
+end );
+
+AddIsomorphismIntoReverseShiftOfShift( homotopy_chains,
+    function( C )
+    local replacement;
+    replacement := UnderlyingReplacement( C );
+    return AsMorphismInHomotopyCategoryByReplacement( 
+        UnderlyingObject( C ),
+        IdentityMorphism( replacement ),
+        UnderlyingReplacement( C )
+    );
+end );
+
+AddIsomorphismFromReverseShiftOfShift( homotopy_chains,
+    function( C )
+    local replacement;
+    replacement := UnderlyingReplacement( C );
+    return AsMorphismInHomotopyCategoryByReplacement( 
+        UnderlyingReplacement( C ),
+        IdentityMorphism( replacement ),
+        UnderlyingObject( C )
+    );
+end );
+
+AddConeObject( homotopy_chains,
+    function( phi )
+    return AsObjectInHomotopyCategory( MappingCone( UnderlyingReplacement( phi ) ) );
+end );
+
+##
+AddCompleteMorphismToStandardExactTriangle( homotopy_chains,
+    function( phi )
+    local replacement, i, p;
+    replacement := UnderlyingReplacement( phi );
+    i := NaturalInjectionInMappingCone( replacement );
+    p := NaturalProjectionFromMappingCone( replacement );
+
+    i := AsMorphismInHomotopyCategoryByReplacement(
+            UnderlyingObject( Range( phi ) ),
+            i,
+            MappingCone( replacement )
+    );
+
+    p := AsMorphismInHomotopyCategoryByReplacement(
+            MappingCone( replacement ),
+            p,
+            UnderlyingObject( ShiftOfObject( Source( phi ) ) )
+    );
+
+    return CreateStandardExactTriangle( phi, i, p );
+
+end );
+
+##
+#AddCompleteToMorphismOfStandardExactTriangles( homotopy_chains,
+#    function( phi )
+#    return true;
+#end );
+
+
+
+
+
 m := HomalgMatrix( "[ x,y,0,z,-x,y ]", 2, 3, R );
 # <A 2 x 3 matrix over an external ring>
 n := HomalgMatrix( "[ x+y,x-y,z,y,0,-x,0,z ]", 4, 2, R );
