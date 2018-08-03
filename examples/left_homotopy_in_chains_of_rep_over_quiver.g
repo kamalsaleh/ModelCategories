@@ -181,13 +181,13 @@ compute_lift_in_quiver_rep :=
     k := LeftActingDomain( AlgebraOfRepresentation( Source( f ) ) );
     V := Vertices( Q );
     homs_basis_composed_with_g := List( homs_basis, m -> PreCompose( m, g ) );
-    L := List( V, v -> Concatenation( [ MatrixOfLinearTransformation( MapForVertex( f, v ) ) ],
-                                        List( homs_basis_composed_with_g, h -> MatrixOfLinearTransformation( MapForVertex( h, v ) ) ) ) );
+    L := List( V, v -> Concatenation( [ RightMatrixOfLinearTransformation( MapForVertex( f, v ) ) ],
+                                        List( homs_basis_composed_with_g, h -> RightMatrixOfLinearTransformation( MapForVertex( h, v ) ) ) ) );
     L := Filtered( L, l -> ForAll( l, m -> not IsZero( DimensionsMat( m )[ 1 ]*DimensionsMat( m )[ 2 ] ) ) );
     L := List( L, l ->  List( l, m -> MatrixByCols( k, [ Concatenation( ColsOfMatrix( m ) ) ] ) ) );
 
     L := List( TransposedMat( L ), l -> StackMatricesVertically( l ) );
-    vector := RowVector( k, ColsOfMatrix( L[ 1 ] )[ 1 ] );
+    vector := StandardVector( k, ColsOfMatrix( L[ 1 ] )[ 1 ] );
     mat := TransposedMat( StackMatricesHorizontally( List( [ 2 .. Length( L ) ], i -> L[ i ] ) ) );
 
     sol := SolutionMat( mat, vector );
@@ -195,7 +195,9 @@ compute_lift_in_quiver_rep :=
     if sol = fail then 
         return fail;
     else
-    sol := sol!.entries;
+    
+    sol := ShallowCopy( AsList( sol ) );
+
     lift := ZeroMorphism( Source( f ), Source( g ) );
     for h in homs_basis do
          if not IsZero( sol[ 1 ] ) then
@@ -225,22 +227,22 @@ compute_colift_in_quiver_rep :=
     k := LeftActingDomain( AlgebraOfRepresentation( Source( f ) ) );
     V := Vertices( Q );
     homs_basis_composed_with_f := List( homs_basis, m -> PreCompose( f, m ) );
-    L := List( V, v -> Concatenation( [ MatrixOfLinearTransformation( MapForVertex( g, v ) ) ],
-                                        List( homs_basis_composed_with_f, h -> MatrixOfLinearTransformation( MapForVertex( h, v ) ) ) ) );
+    L := List( V, v -> Concatenation( [ RightMatrixOfLinearTransformation( MapForVertex( g, v ) ) ],
+                                        List( homs_basis_composed_with_f, h -> RightMatrixOfLinearTransformation( MapForVertex( h, v ) ) ) ) );
     # this line is added because I get errors when MatrixByCols recieve empty matrix 
     # it is still true since i only delete zero matrices from the equation system.
     L := Filtered( L, l -> ForAll( l, m -> not IsZero( DimensionsMat( m )[ 1 ]*DimensionsMat( m )[ 2 ] ) ) );
     L := List( L, l ->  List( l, m -> MatrixByCols( k, [ Concatenation( ColsOfMatrix( m ) ) ] ) ) );
 
     L := List( TransposedMat( L ), l -> StackMatricesVertically( l ) );
-    vector := RowVector( k, ColsOfMatrix( L[ 1 ] )[ 1 ] );
+    vector := StandardVector( k, ColsOfMatrix( L[ 1 ] )[ 1 ] );
     mat := TransposedMat( StackMatricesHorizontally( List( [ 2 .. Length( L ) ], i -> L[ i ] ) ) );
     sol := SolutionMat( mat, vector );
 
     if sol = fail then 
      return fail;
     else
-    sol := ShallowCopy( sol!.entries );
+    sol := ShallowCopy( AsList( sol ) );
     colift := ZeroMorphism( Range( f ), Range( g ) );
     for h in homs_basis do
         if not IsZero( sol[ 1 ] ) then
@@ -366,8 +368,13 @@ return [Q,kQ,AQ];
 end;
 
 ########################################################
+
 quit;
-k := Rationals;
+
+#k := Rationals;
+
+LoadPackage( "RingsForHomalg" );
+k := HomalgFieldOfRationals( );
 
 # Q := RightQuiver("Q(4)[a:1->2,b:1->3,c:2->4,d:3->4]" );
 # kQ := PathAlgebra( k, Q );
@@ -398,13 +405,13 @@ AddAreLeftHomotopic( chains,
     end );
 Finalize( chains );
 
-m12 := MatrixByRows( Rationals, [ [ 2, 4 ] ] );
-m23 := MatrixByRows( Rationals, [ [ 3, 4, 5 ], [ 1, 2, 3 ] ] );
+m12 := MatrixByRows( k, [ [ 2, 4 ] ] );
+m23 := MatrixByRows( k, [ [ 3, 4, 5 ], [ 1, 2, 3 ] ] );
 r1 := QuiverRepresentation( AQ, [ 1, 2, 3 ], [ m12, m23 ] );
-r2 := QuiverRepresentation( AQ, [ 1, 1, 1 ], [ MatrixByRows( Rationals, [ [ 2 ] ] ), MatrixByRows( Rationals, [ [ 4 ] ] ) ] );
-f1 := MatrixByRows( Rationals, [ [ 5 ] ] );
-f2 := MatrixByRows( Rationals, [ [ 3 ], [ 1 ] ] );
-f3 := MatrixByRows( Rationals, [ [ 4 ], [ 0 ], [ 0 ] ] );
+r2 := QuiverRepresentation( AQ, [ 1, 1, 1 ], [ MatrixByRows( k, [ [ 2 ] ] ), MatrixByRows( k, [ [ 4 ] ] ) ] );
+f1 := MatrixByRows( k, [ [ 5 ] ] );
+f2 := MatrixByRows( k, [ [ 3 ], [ 1 ] ] );
+f3 := MatrixByRows( k, [ [ 4 ], [ 0 ], [ 0 ] ] );
 f := QuiverRepresentationHomomorphism( r1, r2, [ f1, f2, f3 ] );
 g := KernelEmbedding( f );
 CA := ChainComplex( [ f, g ], 5 );
@@ -453,7 +460,7 @@ List( L, l -> IsNullHomotopic( PreCompose( l, NaturalInjectionInMappingCone( l )
 #AQ := QuotientOfPathAlgebra( kQ, [ kQ.x10*kQ.x21-kQ.x11*kQ.x20,kQ.x10*kQ.x22-kQ.x12*kQ.x20,kQ.x11*kQ.x22-kQ.x12*kQ.x21 ] );
 
 # or
-
+quit;
 P := BeilinsonQuiverWithRelations( Rationals, 2 );;
 
 Q := P[1];
