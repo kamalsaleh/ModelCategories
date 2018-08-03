@@ -108,8 +108,8 @@ AddLifting( cat,
         function( i )
         local A, B, P, splitting_morphism, direct_sum_to_B, direct_sum_to_X, B_to_direct_sum, t, K, epsilon, X;
         
-	if i < Minimum( ActiveLowerBound( Range( f ) ), ActiveLowerBound( Source( g ) ) ) then 
-	   return ZeroMorphism( Range( f )[ i ], Source( g )[ i ] );
+	    if i <= Maximum( ActiveLowerBound( Range( f ) ), ActiveLowerBound( Source( g ) ) ) then 
+	        return ZeroMorphism( Range( f )[ i ], Source( g )[ i ] );
         fi;
         
         A := Source( f )[ i ];
@@ -131,9 +131,7 @@ AddLifting( cat,
         direct_sum_to_X := MorphismBetweenDirectSums( [ [ u[ i ] ], [ ProjectiveLift( PreCompose( splitting_morphism, v[ i ] ), g[ i ] ) ] ] );
   
         t := PreCompose( B_to_direct_sum, direct_sum_to_X );
-        
-        if i = 0 then return t; fi;
-        
+                
         epsilon := PreCompose( t, X^i ) - PreCompose( Range( f )^i, l[ i - 1 ] );
         
         epsilon := KernelLift( K^( i - 1 ), KernelLift( g[ i - 1 ], CokernelColift( f[ i ], epsilon ) ) );
