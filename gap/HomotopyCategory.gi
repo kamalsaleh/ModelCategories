@@ -210,20 +210,19 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
     ## IsZeroForMorphisms
     AddIsZeroForMorphisms( homotopy_category, 
 
-       function( morphism )
-       local underlying_mor;
+        function( morphism )
+        local underlying_mor;
+        if HasUnderlyingMorphism( morphism ) then
+            underlying_mor := UnderlyingMorphism( morphism );
+        else
+            underlying_mor := UnderlyingReplacement( morphism );
+        fi;
 
-       underlying_mor := UnderlyingMorphism( morphism );
-
-       if HasIsZero( underlying_mor ) and IsZero( underlying_mor ) then
-
-          return true;
-
-       else 
-
-          return is_equal_for_morphisms( underlying_mor, ZeroMorphism( Source( underlying_mor ), Range( underlying_mor ) ) );
-
-       fi;
+        if HasIsZero( underlying_mor ) and IsZero( underlying_mor ) then
+           return true;
+        else 
+           return is_equal_for_morphisms( underlying_mor, ZeroMorphism( Source( underlying_mor ), Range( underlying_mor ) ) );
+        fi;
 
     end );
 
