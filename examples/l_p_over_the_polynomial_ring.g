@@ -10,16 +10,25 @@ cat := LeftPresentations( R: FinalizeCategory := false );
 AddEpimorphismFromSomeProjectiveObject( cat, CoverByFreeModule );
 SetIsAbelianCategoryWithEnoughProjectives( cat, true );
 AddIsProjective( cat, function( P ) 
-                      return not Lift( IdentityMorphism( P ), CoverByFreeModule( P ) ) = fail;
+                        return not Lift( IdentityMorphism( P ), CoverByFreeModule( P ) ) = fail;
                       end );
 Finalize( cat );
+
 chains := ChainComplexCategory( cat : FinalizeCategory := false );
 ModelStructureOnChainComplexes( chains );
+AddLift( chains, compute_lifts_in_chains );
+AddColift( chains, compute_colifts_in_chains );
+
+## These are general categorical operation, not only in context of Model categories.
+AddIsNullHomotopic( chains, phi -> not Colift( NaturalInjectionInMappingCone( IdentityMorphism( Source( phi ) ) ), phi ) = fail );
+AddHomotopyMorphisms( chains, compute_homotopy_chain_morphisms_for_null_homotopic_morphism );
+
 AddAreLeftHomotopic( chains, 
     function( phi, psi )
-        return is_left_homotopic_to_null( phi - psi );
+        return IsNullHomotopic( phi - psi );
+        #return is_left_homotopic_to_null( phi - psi );
     end );
-#CapCategorySwitchLogicOff( chains );
+
 Finalize( chains );
 
 twist_functor := ShiftFunctor( chains, -1 );
@@ -27,6 +36,7 @@ reverse_twist_functor := ShiftFunctor( chains, 1 );
 
 homotopy_chains := HomotopyCategory( chains );
 SetIsTriangulatedCategory( homotopy_chains, true );
+SetIsTriangulatedCategoryWithShiftAutomorphism( homotopy_chains, true );
 
 ## Adding the shift and reverse shift functors
 AddShiftOfObject( homotopy_chains, 
@@ -135,12 +145,76 @@ AddCompleteMorphismToStandardExactTriangle( homotopy_chains,
 end );
 
 ##
-#AddCompleteToMorphismOfStandardExactTriangles( homotopy_chains,
-#    function( phi )
-#    return true;
-#end );
+AddCompleteToMorphismOfStandardExactTriangles( homotopy_chains,
+    function( tr1, tr2, phi_, psi_ )
+    local phi, psi, maps, s, f, g;
+    f := UnderlyingReplacement( tr1^0 );
+    g := UnderlyingReplacement( tr2^0 ); 
+    phi := UnderlyingReplacement( phi_ );
+    psi := UnderlyingReplacement( psi_ );
 
+    s := HomotopyMorphisms( UnderlyingReplacement( PreCompose( tr1^0, psi_ ) - PreCompose( phi_, tr2^0 ) ) );
+    
+    maps := MapLazy( IntegersList,  
+            function( i )
+            return MorphismBetweenDirectSums( [
+                [ phi[ i - 1 ], s[ i - 1 ] ],
+                [ ZeroMorphism( Source( psi )[ i ], Range( phi )[ i - 1 ] ), psi[ i ] ]
+            ] );
+            end, 1 );
 
+    maps := AsMorphismInHomotopyCategory( ChainMorphism( 
+        UnderlyingReplacement( tr1[2] ), 
+        UnderlyingReplacement( tr2[2] ),
+        maps ) );
+
+    return CreateTrianglesMorphism( tr1, tr2, phi_, psi_, maps );
+end );
+
+##
+AddRotationOfStandardExactTriangle( homotopy_chains,
+    function( tr )
+    local rot, standard_rot, X, Y, maps, map, f;
+
+    rot := CreateExactTriangle( tr^1, tr^2, AdditiveInverse( ShiftOfMorphism( tr^0 ) ) );
+    standard_rot := CompleteMorphismToStandardExactTriangle( tr^1 );
+    f := UnderlyingReplacement( tr^0 );
+    X := UnderlyingReplacement( tr[0] );
+    Y := UnderlyingReplacement( tr[1] );
+    maps := MapLazy( IntegersList,  
+            function( i )
+            return MorphismBetweenDirectSums(
+                [ 
+                    [ AdditiveInverse( f[ i - 1 ] ), IdentityMorphism( X[ i - 1 ] ), ZeroMorphism( X[ i - 1 ], Y[ i ] ) ]
+                ]
+            );
+            end, 1 );
+    map := ChainMorphism( UnderlyingReplacement( rot[ 2 ] ), UnderlyingReplacement( standard_rot[ 2 ] ), maps );
+    map := AsMorphismInHomotopyCategory( map );
+    map := CreateTrianglesMorphism( 
+                rot, standard_rot, IdentityMorphism( tr[ 1 ] ), IdentityMorphism( tr[ 2 ] ), map 
+                );
+    SetIsomorphismIntoStandardExactTriangle( rot, map );
+
+    maps := MapLazy( IntegersList,  
+            function( i )
+            return MorphismBetweenDirectSums(
+                [ 
+                    [ ZeroMorphism( Y[ i - 1 ], X[ i - 1 ] ) ],
+                    [ IdentityMorphism( X[ i - 1 ] )         ], 
+                    [ ZeroMorphism( Y[ i ], X[ i - 1 ] )     ]
+                ]
+            );
+            end, 1 );
+    map := ChainMorphism( UnderlyingReplacement( standard_rot[ 2 ] ), UnderlyingReplacement( rot[ 2 ] ), maps );
+    map := AsMorphismInHomotopyCategory( map );
+    map := CreateTrianglesMorphism( 
+                standard_rot, rot, IdentityMorphism( tr[ 1 ] ), IdentityMorphism( tr[ 2 ] ), map 
+                );
+    SetIsomorphismFromStandardExactTriangle( rot, map );
+
+    return rot;
+end );
 
 
 
@@ -162,6 +236,9 @@ CN := StalkChainComplex( N, 1 );
 # <A bounded object in chain complexes category over category of left presentations of Q[x,y,z] with active lower bound 0 and active upper bound 2>
 phi := ChainMorphism( CM, CN, [ f1 ], 1 );
 # <A bounded morphism in chain complexes category over category of left presentations of Q[x,y,z] with active lower bound 0 and active upper bound 2>
+
+quit;
+
 IsWellDefined( phi );
 # true
 CM_cofib := CofibrantModel( CM );
