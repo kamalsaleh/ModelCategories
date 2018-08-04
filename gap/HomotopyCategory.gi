@@ -159,9 +159,15 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
     # IsEqualForMorphisms
     AddIsEqualForMorphisms( homotopy_category,
         function( morphism1, morphism2 )
-        return is_equal_for_morphisms( UnderlyingMorphism( morphism1 ), UnderlyingMorphism( morphism2 ) );
+            if HasUnderlyingMorphism( morphism1 ) and HasUnderlyingMorphism( morphism2 ) then
+                return is_equal_for_morphisms( UnderlyingMorphism( morphism1 ), UnderlyingMorphism( morphism2 ) );
+            else
+                return is_equal_for_morphisms( UnderlyingReplacement( morphism1 ), UnderlyingReplacement( morphism2 ) );
+            fi;
         end );
-        
+    
+    AddIsCongruentForMorphisms( homotopy_category, IsEqualForMorphisms );
+
     # Methods on morphisms
     AddPreCompose( homotopy_category, 
         function( morphism1, morphism2 )
