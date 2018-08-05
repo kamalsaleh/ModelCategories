@@ -151,6 +151,22 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
        
     fi;
 
+    AddIsWellDefinedForObjects( homotopy_category,
+        function( obj )
+        return IsWellDefined( UnderlyingObject( obj ) );
+    end );
+
+    AddIsWellDefinedForMorphisms( homotopy_category,
+        function( morphism )
+        if HasUnderlyingMorphism( morphism ) then
+            return IsWellDefined( UnderlyingMorphism( morphism ) );
+        else
+            return IsWellDefined( UnderlyingReplacement( morphism ) ) and 
+                    IsEqualForObjects( UnderlyingReplacement( Source( morphism ) ), Source( UnderlyingReplacement( morphism ) ) ) and
+                    IsEqualForObjects( UnderlyingReplacement( Range( morphism ) ), Range( UnderlyingReplacement( morphism ) ) );
+        fi;
+    end );
+
     # IsEqualForObjects
     AddIsEqualForObjects( homotopy_category,
         function( obj1, obj2 )
