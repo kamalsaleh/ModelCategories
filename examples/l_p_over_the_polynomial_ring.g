@@ -218,7 +218,7 @@ end );
 
 AddOctahedralAxiom( homotopy_chains,
     function( f_, g_ )
-    local h_, f, g, h, X, Y, Z, t0, t1, t2, t, tf_, th_;
+    local h_, f, g, h, X, Y, Z, t0, t1, t2, t, tf_, th_, tr, i, j, standard_tr;
     h_ := PreCompose( f_, g_ );
     f := UnderlyingReplacement( f_ );
     g := UnderlyingReplacement( g_ );
@@ -257,8 +257,45 @@ AddOctahedralAxiom( homotopy_chains,
     t2 := ChainMorphism( MappingCone( g ), ShiftLazy( MappingCone( f ), -1 ), t2 );
     t2 := AsMorphismInHomotopyCategory( t2 );
 
-    # Dont forget the isomorphisms into and from the standard exact triangle
-    return CreateExactTriangle( t0, t1, t2 );
+
+    tr := CreateExactTriangle( t0, t1, t2 );
+
+    standard_tr := CompleteMorphismToStandardExactTriangle( t0 );
+
+    i := MapLazy( IntegersList, 
+            function( i )
+            return MorphismBetweenDirectSums( 
+                [
+                    [ ZeroMorphism( Y[i-1], X[i-2] ), IdentityMorphism( Y[i-1] ), ZeroMorphism( Y[i-1], X[i-1] ), ZeroMorphism( Y[i-1], Z[i] ) ],
+                    [ ZeroMorphism( Z[i], X[i-2] ), ZeroMorphism( Z[i], Y[i-1] ), ZeroMorphism( Z[i], X[i-1] ), IdentityMorphism( Z[i] ) ] 
+                ]
+            );
+            end, 1 );
+    i := ChainMorphism( MappingCone( g ), MappingCone( UnderlyingMorphism( t0 ) ), i );
+    i := AsMorphismInHomotopyCategory( i );
+    i := CreateTrianglesMorphism( tr, standard_tr, IdentityMorphism( tr[0] ), IdentityMorphism( tr[1] ), i );
+
+    j := MapLazy( IntegersList, 
+            function( i )
+            return MorphismBetweenDirectSums( 
+                [
+                    [  ZeroMorphism( X[i-2], Y[i-1] ), ZeroMorphism(  X[i-2], Z[i] ) ],
+                    [  IdentityMorphism( Y[i-1] ),     ZeroMorphism(  Y[i-1], Z[i] ) ],
+                    [  f[i-1], ZeroMorphism(  X[i-1], Z[i] ) ],
+                    [  ZeroMorphism( Z[i], Y[i-1]   ), IdentityMorphism( Z[i] ) ] 
+                ]
+            );
+            end, 1 );
+    
+    j := ChainMorphism( MappingCone( UnderlyingMorphism( t0 ) ), MappingCone( g ), j );
+    j := AsMorphismInHomotopyCategory( j );
+    j := CreateTrianglesMorphism( standard_tr, tr, IdentityMorphism( tr[0] ), IdentityMorphism( tr[1] ), j );
+
+    SetIsomorphismIntoStandardExactTriangle( tr, i );
+    SetIsomorphismFromStandardExactTriangle( tr, j );
+    
+    return tr;
+
 end );
 
 
