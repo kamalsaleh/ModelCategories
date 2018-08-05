@@ -216,6 +216,50 @@ AddRotationOfStandardExactTriangle( homotopy_chains,
     return rot;
 end );
 
+AddOctahedralAxiom( homotopy_chains,
+    function( f_, g_ )
+    local h_, f, g, h, X, Y, Z, t0, t1, t2, t, tf_, th_;
+    h_ := PreCompose( f_, g_ );
+    f := UnderlyingReplacement( f_ );
+    g := UnderlyingReplacement( g_ );
+    h := UnderlyingReplacement( h_ );
+    X := Source( f );
+    Y := Range( f );
+    Z := Range( g );
+
+    tf_ := CompleteMorphismToStandardExactTriangle( f_ );
+    th_ := CompleteMorphismToStandardExactTriangle( h_ );
+
+    t := CompleteToMorphismOfStandardExactTriangles( tf_, th_, IdentityMorphism( Source( f_ ) ), g_ );
+    t0 := t[ 2 ];
+
+    t1 := MapLazy( IntegersList, 
+            function( i ) 
+                return MorphismBetweenDirectSums(
+                    [
+                        [ f[ i - 1 ], ZeroMorphism( X[ i - 1 ], Z[ i ] )],
+                        [ ZeroMorphism( Z[ i ], Y[ i - 1 ] ), IdentityMorphism( Z[ i ] ) ]
+                    ]
+                );
+            end, 1 );
+    t1 := ChainMorphism( MappingCone( h ), MappingCone( g ), t1 );
+    t1 := AsMorphismInHomotopyCategory( t1 );
+
+    t2 := MapLazy( IntegersList, 
+            function( i ) 
+                return MorphismBetweenDirectSums(
+                    [
+                        [ ZeroMorphism( Y[ i - 1 ], X[ i - 2 ] ), IdentityMorphism( Y[ i - 1 ] ) ],
+                        [ ZeroMorphism( Z[ i ], X[ i - 2 ] ), ZeroMorphism( Z[ i ], Y[ i - 1 ] ) ]
+                    ]
+                );
+            end, 1 );
+    t2 := ChainMorphism( MappingCone( g ), ShiftLazy( MappingCone( f ), -1 ), t2 );
+    t2 := AsMorphismInHomotopyCategory( t2 );
+
+    # Dont forget the isomorphisms into and from the standard exact triangle
+    return CreateExactTriangle( t0, t1, t2 );
+end );
 
 
 m := HomalgMatrix( "[ x,y,0,z,-x,y ]", 2, 3, R );
