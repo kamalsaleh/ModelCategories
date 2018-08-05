@@ -215,7 +215,7 @@ AddDerivationToCAP( MorphismBetweenCofibrantModels,
     Assert( 5, IsCofibration( f ) );
     
     SetIsCofibration( f, true );
-    
+
     l := Lifting( f, g, u, v );
 
     Assert( 5, IsCofibrant( Source( l ) ) );

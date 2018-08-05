@@ -189,21 +189,21 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
         function( morphism1, morphism2 )
         local morphism;
         
-        if HasUnderlyingMorphism( morphism1 ) and HasUnderlyingMorphism( morphism2 ) then
-            morphism := PreCompose( UnderlyingMorphism( morphism1 ), UnderlyingMorphism( morphism2 ) );
-            AddToToDoList( ToDoListEntry( [ [ morphism1, "UnderlyingReplacement" ], [ morphism2, "UnderlyingReplacement" ]  ],
-                                        function( )
-                                        if not HasUnderlyingReplacement( morphism ) then
-                                            SetUnderlyingReplacement( morphism, PreCompose( UnderlyingReplacement( morphism1 ), UnderlyingReplacement( morphism2 ) ) );
-                                        fi;
-                                        end ) );
-            return AsMorphismInHomotopyCategory( morphism );
-        else
+        # if HasUnderlyingMorphism( morphism1 ) and HasUnderlyingMorphism( morphism2 ) then
+        #     morphism := PreCompose( UnderlyingMorphism( morphism1 ), UnderlyingMorphism( morphism2 ) );
+        #     AddToToDoList( ToDoListEntry( [ [ morphism1, "UnderlyingReplacement" ], [ morphism2, "UnderlyingReplacement" ]  ],
+        #                                 function( )
+        #                                 if not HasUnderlyingReplacement( morphism ) then
+        #                                     SetUnderlyingReplacement( morphism, PreCompose( UnderlyingReplacement( morphism1 ), UnderlyingReplacement( morphism2 ) ) );
+        #                                 fi;
+        #                                 end ) );
+        #     return AsMorphismInHomotopyCategory( morphism );
+        # else
             morphism := PreCompose( UnderlyingReplacement( morphism1 ), UnderlyingReplacement( morphism2 ) );
             return AsMorphismInHomotopyCategoryByReplacement(
                 UnderlyingObject( Source( morphism1 ) ), morphism, UnderlyingObject( Range( morphism2 ) )
             );
-        fi;
+        # fi;
     end );
 
     
