@@ -222,10 +222,12 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
       function( morphism1, morphism2 )
         local sum;
 
-        sum := AdditionForMorphisms( UnderlyingMorphism( morphism1 ),
-                                     UnderlyingMorphism( morphism2 ) );
+        sum := AdditionForMorphisms( UnderlyingReplacement( morphism1 ),
+                                     UnderlyingReplacement( morphism2 ) );
 
-        return AsMorphismInHomotopyCategory( sum );
+        return AsMorphismInHomotopyCategoryByReplacement( 
+            UnderlyingObject( Source( morphism1 ) ), sum, UnderlyingObject( Range( morphism1 ) ) 
+            );
 
     end );
 
@@ -274,10 +276,11 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
       function( morphism )
         local new_mor;
 
-        new_mor := AdditiveInverseForMorphisms( UnderlyingMorphism( morphism ) );
+        new_mor := AdditiveInverseForMorphisms( UnderlyingReplacement( morphism ) );
 
-        return AsMorphismInHomotopyCategory( new_mor );
-
+        return AsMorphismInHomotopyCategoryByReplacement( 
+            UnderlyingObject( Source( morphism ) ), new_mor, UnderlyingObject( Range( morphism ) )
+             );
     end );
 
     ## Zero morphism
