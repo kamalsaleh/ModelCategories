@@ -344,7 +344,7 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
         function( )
         local zero_obj;
 
-        zero_obj := ZeroObject( UnderlyingCategory( homotopy_category ) );
+        zero_obj := ZeroObject( UnderlyingModelCategory( homotopy_category ) );
 
         return AsObjectInHomotopyCategory( zero_obj );
 
