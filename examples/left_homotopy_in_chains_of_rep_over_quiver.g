@@ -1,5 +1,5 @@
 
-# This example requires QPA2 in my devel branch in github: https://github.com/kamalsaleh/QPA2.git
+# This example requires QPA2 in my devel2 branch in github: https://github.com/kamalsaleh/QPA2.git
 LoadPackage( "QPA" );
 LoadPackage( "ComplexesForCAP" );
 LoadPackage( "ModelCategories" );
@@ -11,6 +11,37 @@ DeclareOperation( "LinearQuiver", [ IsDirection, IsObject, IsInt, IsInt ] );
 DeclareOperation( "LinearRightQuiver", [ IsObject, IsInt, IsInt ] );
 DeclareOperation( "LinearLeftQuiver", [ IsObject, IsInt, IsInt ] );
 DeclareOperation( "ArrowsBetweenTwoVertices", [ IsVertex, IsVertex ] );
+
+if not IsBoundGlobal( "GeneratorsOfExternalHom" ) then
+    DeclareOperation( "GeneratorsOfExternalHom", [ IsCapCategoryObject, IsCapCategoryObject ] );
+fi;
+
+if not IsBoundGlobal( "BasisOfExternalHom" ) then
+    DeclareOperation( "BasisOfExternalHom", [ IsCapCategoryObject, IsCapCategoryObject ] );
+fi;
+
+##
+InstallMethod( BasisOfExternalHom, 
+    [ IsCapCategoryObject, IsCapCategoryObject ],
+    function( M, N )
+    if IsQuiverRepresentation( M ) and IsQuiverRepresentation( N ) then
+        return BasisOfHom( M, N );
+    else
+        TryNextMethod( );
+    fi;    
+end );
+
+##
+InstallMethod( GeneratorsOfExternalHom, 
+    [ IsCapCategoryObject, IsCapCategoryObject ],
+    function( M, N )
+    if IsQuiverRepresentation( M ) and IsQuiverRepresentation( N ) then
+        return BasisOfHom( M, N );
+    else
+        TryNextMethod( );
+    fi;    
+end );
+
 
 InstallMethod( LinearQuiver,
 	[ IsDirection, IsObject, IsInt, IsInt ],
@@ -165,6 +196,26 @@ generators_of_hom_for_chains :=
     B := BasisOfHom( R1, R2 );
     return List( B, mor -> convert_rep_mor_to_complex_mor( C1, C2, mor, A ) );
 end;
+
+InstallMethodWithCache( GeneratorsOfExternalHom, 
+    [ IsCapCategoryObject, IsCapCategoryObject ],
+    function( M, N )
+    if IsChainComplex( M ) and IsChainComplex( N ) then
+        return generators_of_hom_for_chains( M, N );
+    else
+        TryNextMethod( );
+    fi;
+end );
+
+InstallMethodWithCache( BasisOfExternalHom, 
+    [ IsCapCategoryObject, IsCapCategoryObject ],
+    function( M, N )
+    if IsChainComplex( M ) and IsChainComplex( N ) then
+        return generators_of_hom_for_chains( M, N );
+    else
+        TryNextMethod( );
+    fi;
+end );
 
 compute_lift_in_quiver_rep :=
     function( f, g )
@@ -386,7 +437,7 @@ end;
 
 # or
 
-field := HomalgFieldOfRationals( );
+#field := HomalgFieldOfRationals( );
 field := Rationals;
 P := BeilinsonQuiverWithRelations( field, 2 );;
 
@@ -431,13 +482,34 @@ p1 := indec_projectives[1];
 p2 := indec_projectives[2];
 p3 := indec_projectives[3];
 
+C1 := StalkChainComplex( p1, 0 );
+C2 := StalkChainComplex( p2, 0 );
+C3 := StalkChainComplex( p3, 0 );
 
+B21 := BasisOfExternalHom( C2, C1 );
+B32 := BasisOfExternalHom( C3, C2 );
+B31 := BasisOfExternalHom( C3, C1 );
+
+f := Random( B32 );
+IsNullHomotopic( f );
+hf := AsMorphismInHomotopyCategory( f );
+IsZeroForMorphisms( hf );
+tr_hf := CompleteMorphismToStandardExactTriangle( hf );
+IsWellDefined( tr_hf );
+Display( tr_hf );
 
 ########################################################
 
 quit;
 
 #k := Rationals;
+
+#           a
+#       1 ---> 2
+#     b |      | c
+#       v      v
+#       3 ---> 4
+#           d
 
 # Q := RightQuiver("Q(4)[a:1->2,b:1->3,c:2->4,d:3->4]" );
 # kQ := PathAlgebra( k, Q );
