@@ -366,18 +366,6 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
 
     end );
 
-    AddDirectSumFunctorialWithGivenDirectSums( homotopy_category,
-        function( source, L, range )
-        local maps, morphism;
-
-        maps := List( L, i-> UnderlyingMorphism( i ) );
-
-        morphism := DirectSumFunctorial( maps );
-
-        return AsMorphismInHomotopyCategory( morphism );
-
-    end );
-
     AddInjectionOfCofactorOfDirectSum( homotopy_category,
         function( L, n )
         local underlying_list, i;
@@ -400,6 +388,32 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
 
         return AsMorphismInHomotopyCategory( i );
 
+    end );
+
+    AddDirectSumFunctorialWithGivenDirectSums( homotopy_category,
+        function( source, L, range )
+        local maps, morphism, morphism1, morphism2, sources, ranges;
+
+        maps := List( L, i-> UnderlyingReplacement( i ) );
+
+        morphism := DirectSumFunctorial( maps );
+
+        # now the source of morphism is the direct sum of replacements of sources in L and 
+        # the same holds for the range.
+        # so we need to somehow to find isomorphism from the replacement of direct sum to the direct sum of replacements...
+
+        sources := List( L, Source );
+        morphism1 := MorphismBetweenDirectSums( [ 
+            List( [ 1 .. Length( sources ) ], i -> UnderlyingReplacement( ProjectionInFactorOfDirectSum( sources, i ) ) )
+        ] );
+
+        ranges := List( L, Range );
+        morphism2 := MorphismBetweenDirectSums( 
+            List( [ 1 .. Length( ranges ) ],  i-> [ UnderlyingReplacement( InjectionOfCofactorOfDirectSum( ranges, i ) ) ] )
+          );
+
+        morphism := PreCompose( [ morphism1, morphism, morphism2 ] );
+        return AsMorphismInHomotopyCategoryByReplacement( UnderlyingObject( source ), morphism, UnderlyingObject( range ) );
     end );
 
     AddUniversalMorphismIntoDirectSum( homotopy_category,
