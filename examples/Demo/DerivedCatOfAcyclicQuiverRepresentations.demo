@@ -6,7 +6,7 @@ field := Rationals;
 # field := HomalgFieldOfRationals();
 %
 # function to create the required data for the Beilinson quiver of D(P^2).
-P := BeilinsonQuiverWithRelations( field, 2 );;%
+P := BeilinsonQuiverWithRelations( field, 2 );;
 %
 Q := P[1];
 %
@@ -125,9 +125,9 @@ IsWellDefined( tr_hf );
 %
 Display( tr_hf );
 %
-tr_hf[0];t%r_hf[1]; %tr_hf[2];t%r_hf[3];
+tr_hf[0];tr_hf[1];tr_hf[2];tr_hf[3];
 %
-tr_hf^0; %tr_hf^1; %tr_hf^2;
+tr_hf^0;tr_hf^1;tr_hf^2;
 %
 rot_tr_hf := RotationOfStandardExactTriangle( tr_hf );
 %
