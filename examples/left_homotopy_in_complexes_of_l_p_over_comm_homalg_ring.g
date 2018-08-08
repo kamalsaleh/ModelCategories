@@ -4,6 +4,10 @@ LoadPackage( "ComplexesForCAP" );
 
 ############### computing homotopy ###########################
 
+if not IsBoundGlobal( "GeneratorsOfExternalHom" ) then
+    DeclareOperation( "GeneratorsOfExternalHom", [ IsCapCategoryObject, IsCapCategoryObject ] );
+fi;
+
 Compute_Homotopy := 
   function( phi, s, n )
   local A, B, ring, r, mat, j, k, l,i, current_mat, t, b, current_b, list, var, sol, union_of_columns, union_of_rows;
@@ -497,3 +501,17 @@ compute_homotopy_cochain_morphisms_for_null_homotopic_morphism :=
             return MapLazy( IntegersList, n -> list[ -n ], 1 );
         fi;
 end;
+
+InstallMethodWithCache( GeneratorsOfExternalHom, 
+    [ IsChainComplex, IsChainComplex ],
+    function( C, D )
+    return generators_of_hom_for_chains( C, D );
+end );
+
+InstallMethodWithCache( GeneratorsOfExternalHom, 
+    [ IsCochainComplex, IsCochainComplex ],
+    function( C, D )
+    return generators_of_hom_for_cochains( C, D );
+end );
+
+
