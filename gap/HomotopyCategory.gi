@@ -235,17 +235,15 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
     AddIsZeroForMorphisms( homotopy_category,
 
         function( morphism )
-        local underlying_mor;
-        if HasUnderlyingMorphism( morphism ) then
-            underlying_mor := UnderlyingMorphism( morphism );
-        else
-            underlying_mor := UnderlyingReplacement( morphism );
-        fi;
-
-        if HasIsZero( underlying_mor ) and IsZero( underlying_mor ) then
+        local underlying_rep;
+        # Here we must take the underlying replacement. In some cases (for example dynkin quivers A_n)
+        # The morphism itself is not null-homotopic but its replacement is.
+        # To create example take any exact complex and find if its zero or not.
+	underlying_rep := UnderlyingReplacement( morphism );
+        if HasIsZero( underlying_rep ) and IsZero( underlying_rep ) then
            return true;
         else
-           return is_equal_for_morphisms( underlying_mor, ZeroMorphism( Source( underlying_mor ), Range( underlying_mor ) ) );
+           return is_equal_for_morphisms( underlying_rep, ZeroMorphism( Source( underlying_rep ), Range( underlying_rep ) ) );
         fi;
 
     end );
