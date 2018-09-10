@@ -32,7 +32,7 @@ InstallMethod( BasisOfExternalHom,
 end );
 
 ##
-InstallMethod( GeneratorsOfExternalHom, 
+InstallMethodWithCache( GeneratorsOfExternalHom, 
     [ IsCapCategoryObject, IsCapCategoryObject ],
     function( M, N )
     if IsQuiverRepresentation( M ) and IsQuiverRepresentation( N ) then
