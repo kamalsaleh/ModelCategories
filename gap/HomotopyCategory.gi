@@ -336,6 +336,25 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
 
          end );
 
+    if CanCompute( cat, "HomotopyMorphisms" ) then
+        AddInverse( homotopy_category,
+        function( phi )
+        local rep_phi, p, H, i, lower_bound, upper_bound, morphisms, rep_inverse;
+        rep_phi := UnderlyingReplacement( phi );
+        p := NaturalProjectionFromMappingCone( rep_phi );
+        if not IsNullHomotopic( p ) then
+            Error( "A morphism which should be null homotopic is not null homotopic" );
+        fi;
+        H := HomotopyMorphisms( p );
+        i := NaturalInjectionInMappingCone( rep_phi );
+        lower_bound := ActiveLowerBound( Range( rep_phi ) );
+        upper_bound := ActiveUpperBound( Range( rep_phi ) );
+        morphisms := MapLazy( IntegersList, j -> PreCompose( i[j], H[j] ), 1 );
+        rep_inverse := ChainMorphism( Range( rep_phi ), Source( rep_phi ), morphisms );
+        return AsMorphismInHomotopyCategoryByReplacement( UnderlyingObject( Range( phi ) ), rep_inverse, UnderlyingObject( Source( phi ) ) );
+        end, 100 );
+    fi;
+
     ## Zero object
     AddZeroObject( homotopy_category,
 
