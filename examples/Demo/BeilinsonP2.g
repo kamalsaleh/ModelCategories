@@ -47,7 +47,8 @@ AddLift( chains, compute_lifts_in_complexes );
 
 AddColift( chains, compute_colifts_in_complexes );
 
-AddIsNullHomotopic( chains, phi -> not Colift( NaturalInjectionInMappingCone( IdentityMorphism( Source( phi ) ) ), phi ) = fail );
+AddIsNullHomotopic( chains, 
+    phi -> IsZeroForMorphisms( phi ) or not Colift( NaturalInjectionInMappingCone( IdentityMorphism( Source( phi ) ) ), phi ) = fail );
 
 AddHomotopyMorphisms( chains, compute_homotopy_chain_morphisms_for_null_homotopic_morphism );
 
@@ -109,7 +110,7 @@ omega_00 := ChainComplex( [ f00_1, f00_2 ], 1 );
 l := [ [some_name( 2,1,[ 1 ],-1),some_name( 2,1,[ 3 ],-1),some_name( 2,1,[ 2 ],1) ] ];
 f11_1 := MorphismBetweenDirectSums(l);
 omega_11 := ChainComplex( [ f11_1 ], 1 );
-omega_22 := StalkChainComplex( p2, 0 );
+omega_22 := StalkChainComplex( p1, 0 );
 GeneratorsOfExternalHom( omega_22, omega_00 );
 
 quit;
