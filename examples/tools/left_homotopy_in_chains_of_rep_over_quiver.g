@@ -5,7 +5,7 @@ LoadPackage( "ComplexesForCAP" );
 LoadPackage( "ModelCategories" );
 LoadPackage( "TriangulatedCategoriesForCAP");
 LoadPackage( "RingsForHomalg" );
-ReadPackage( "ModelCategories", "examples/Triangulated_Structure.g" );
+ReadPackage( "ModelCategories", "examples/tools/Triangulated_Structure.g" );
 
 DeclareOperation( "LinearQuiver", [ IsDirection, IsObject, IsInt, IsInt ] );
 DeclareOperation( "LinearRightQuiver", [ IsObject, IsInt, IsInt ] );

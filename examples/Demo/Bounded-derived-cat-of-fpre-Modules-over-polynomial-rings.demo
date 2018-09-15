@@ -3,10 +3,11 @@ LoadPackage( "ModulePresentations" );
 LoadPackage( "ModelCategories" );
 LoadPackage( "TriangulatedCategoriesForCAP" );
 %
-ReadPackage( "ModelCategories", "examples/left_homotopy_in_complexes_of_l_p_over_comm_homalg_ring.g" );
-ReadPackage( "ModelCategories", "examples/Triangulated_Structure.g" );
+ReadPackage( "ModelCategories", "examples/tools/left_homotopy_in_complexes_of_l_p_over_comm_homalg_ring.g" );
+ReadPackage( "ModelCategories", "examples/tools/Triangulated_Structure.g" );
 %
 R := HomalgFieldOfRationalsInSingular()*"x,y,z";;
+%
 cat := LeftPresentations( R: FinalizeCategory := false );
 AddEpimorphismFromSomeProjectiveObject( cat, CoverByFreeModule );
 SetIsAbelianCategoryWithEnoughProjectives( cat, true );
@@ -21,7 +22,7 @@ AddLift( chains, compute_lifts_in_chains );
 AddColift( chains, compute_colifts_in_chains );
 
 ## These are general categorical operation, not only in context of Model categories.
-AddIsNullHomotopic( chains, phi -> not Colift( NaturalInjectionInMappingCone( IdentityMorphism( Source( phi ) ) ), phi ) = fail );
+AddIsNullHomotopic( chains, phi -> IsZeroForMorphisms( phi ) or Colift( NaturalInjectionInMappingCone( IdentityMorphism( Source( phi ) ) ), phi ) <> fail );
 AddHomotopyMorphisms( chains, compute_homotopy_chain_morphisms_for_null_homotopic_morphism );
 
 AddAreLeftHomotopic( chains, 
@@ -40,48 +41,52 @@ m := HomalgMatrix( "[ x,y,0,z,-x,y ]", 2, 3, R );
 %
 n := HomalgMatrix( "[ x+y,x-y,z,y,0,-x,0,z ]", 4, 2, R );
 %
-p := HomalgMatrix( "[ x-y,x+y, 2x,y,z,y+z,-x,0,-x,z,0,z ]", 4, 3, R );
-%
 M := AsLeftPresentation( m );
 %
 N := AsLeftPresentation( n );
-%
-P := AsLeftPresentation( p );
 %
 CM := StalkChainComplex( M, 1 );
 %
 CN := StalkChainComplex( N, 1 );
 %
-CP := StalkChainComplex( P, 1 );
-%
 G_MN := GeneratorsOfExternalHom( CM, CN );
 %
-G_NP := GeneratorsOfExternalHom( CN, CP );
+Cf := Random( G_MN );
 %
-f := Random( G_MN );
+# In theory the natural embedding of range in the mapping cylinder is quasi-isomorphism :)
+#
+phi := NaturalInjectionOfRangeInMappingCylinder( Cf );
 %
-g := Random( G_NP );
+h_phi := AsMorphismInHomotopyCategory( phi );
 %
-hf := AsMorphismInHomotopyCategory( f );
+IsIsomorphism( h_phi );
 %
-hg := AsMorphismInHomotopyCategory( g );
+h_psi := Inverse( h_phi );
 %
-tr := OctahedralAxiom( hf, hg );
+IsCongruentForMorphisms( PreCompose( h_phi, h_psi ), IdentityMorphism( Source( h_phi ) ) );
 %
-IsStandardExactTriangle( tr );
+IsCongruentForMorphisms( PreCompose( h_psi, h_phi ), IdentityMorphism( Source( h_psi ) ) );
 %
-i := IsomorphismIntoStandardExactTriangle( tr );
+Display( h_psi );
 %
-j := IsomorphismFromStandardExactTriangle( tr );
+quasi_1_to_CN := AcyclicFibrationFromCofibrantModel( Range( phi ) );
+Q1 := Source( quasi_1_to_CN );
 %
-ij := PreCompose(i,j);
+quasi_2_to_CN := PreCompose( AcyclicFibrationFromCofibrantModel( CN ), phi );
+Q2 := Source( quasi_2_to_CN );
 %
-ji := PreCompose(j,i);
+#
+#
+#      e ------------------> Q1
+#      |                  /  |
+#      |             /       | quasi_1_to_CN
+#      |        /            |
+#      V   /                 V
+#      Q2 -----------------> cylinder
+#           quasi_2_to_CN
+#
 %
-IsCongruentForMorphisms( ij, IdentityMorphism( Source(i) ) );
+L := Lifting( UniversalMorphismFromInitialObject( Q2 ), quasi_1_to_CN,
+              UniversalMorphismFromInitialObject( Q1 ), quasi_2_to_CN  );
 %
-IsIsomorphism( ji );
-%
-rot_tr := RotationOfExactTriangle(tr);
-%
-IsWellDefined( rot_tr );
+Display( L );

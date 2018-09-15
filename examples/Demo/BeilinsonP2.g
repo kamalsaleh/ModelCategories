@@ -1,5 +1,5 @@
 # Please pull the branch devel2 or mohamed of QPA2 at https://github.com/kamalsaleh/QPA2
-ReadPackage( "ModelCategories", "examples/left_homotopy_in_chains_of_rep_over_quiver.g" );
+ReadPackage( "ModelCategories", "examples/tools/left_homotopy_in_chains_of_rep_over_quiver.g" );
 
 field := Rationals;
 
@@ -140,7 +140,7 @@ K := CokernelObject( f );
 
 hK := AsObjectInHomotopyCategory( K );
 
-IsIdenticalObj( UnderlyingObject( hK ), K );
+IsIdenticalObj( UnderlyingObj( hK ), K );
 
 rep_hK := UnderlyingReplacement( hK );
 
@@ -154,7 +154,7 @@ Display( hf );
 
 IsWellDefined( hf );
 
-IsIdenticalObj( UnderlyingMorphism( hf), f );
+IsIdenticalObj( UnderlyingMor( hf), f );
 
 rep_hf := UnderlyingReplacement( hf );
 

@@ -1,0 +1,90 @@
+%
+LoadPackage( "ModulePresentations" );
+LoadPackage( "ModelCategories" );
+LoadPackage( "TriangulatedCategoriesForCAP" );
+%
+ReadPackage( "ModelCategories", "examples/tools/left_homotopy_in_complexes_of_l_p_over_comm_homalg_ring.g" );
+ReadPackage( "ModelCategories", "examples/tools/Triangulated_Structure.g" );
+%
+ZZ := HomalgRingOfIntegers( );;
+%
+cat := LeftPresentations( ZZ: FinalizeCategory := false );
+AddIsProjective( cat, function( P ) 
+                        return Lift( IdentityMorphism( P ), EpimorphismFromSomeProjectiveObject( P ) ) <> fail;
+                      end );
+Finalize( cat );
+%
+chains := ChainComplexCategory( cat : FinalizeCategory := false );
+ModelStructureOnChainComplexes( chains );
+AddLift( chains, compute_lifts_in_chains );
+AddColift( chains, compute_colifts_in_chains );
+
+## These are general categorical operation, not only in context of Model categories.
+AddIsNullHomotopic( chains, phi -> IsZeroForMorphisms( phi ) or Colift( NaturalInjectionInMappingCone( IdentityMorphism( Source( phi ) ) ), phi ) <> fail );
+AddHomotopyMorphisms( chains, compute_homotopy_chain_morphisms_for_null_homotopic_morphism );
+
+AddAreLeftHomotopic( chains, 
+    function( phi, psi )
+        return IsNullHomotopic( phi - psi );
+        #return is_left_homotopic_to_null( phi - psi );
+    end );
+
+Finalize( chains );
+%
+homotopy_chains := HomotopyCategory( chains :FinalizeCategory := false );
+AddTriangulatedStructure( homotopy_chains );
+Finalize( homotopy_chains );
+%
+#
+#
+#     -1          0          1          2         3
+#                      2 0
+#                      0 0        0 1  
+#  C:  0 <-----  Z^2 <----- Z^2 <------ Z <------ 0
+#                 |
+#           1 0   |
+#           0 1   |
+#                 v
+#  D:          Z/2 + Z
+#
+#
+%
+# Z/2 + Z = coker( [ [ 2, 0 ] ] )
+Z_2_x_Z := AsLeftPresentation( HomalgMatrix( [ [ 2, 0 ] ], ZZ ) );
+%
+# Z := free module of rank 1
+Z1 := FreeLeftPresentation( 1, ZZ );
+Z2 := FreeLeftPresentation( 2, ZZ );
+%
+delta_1 := PresentationMorphism( Z2, HomalgMatrix( [ [ 2, 0 ],[ 0, 0 ] ], ZZ ), Z2 );
+%
+delta_2 := PresentationMorphism( Z1, HomalgMatrix( [ [ 0, 1 ] ], ZZ ), Z2 );
+%
+C := ChainComplex( [ delta_1, delta_2 ], 1 );
+%
+D := StalkChainComplex( Z_2_x_Z, 0 );
+%
+phi_0 := PresentationMorphism( Z2, HomalgIdentityMatrix( 2, ZZ ), Z_2_x_Z );
+%
+phi := ChainMorphism( C, D, [ phi_0 ], 0 );
+%
+IsWellDefined( phi );
+%
+IsQuasiIsomorphism( phi );
+%
+IsIsomorphism( phi );
+%
+h_phi := AsMorphismInHomotopyCategory( phi );
+%
+IsIsomorphism( h_phi );
+%
+h_psi := Inverse( h_phi );
+%
+Display( Source( h_psi ) );
+%
+Display( h_psi );
+%
+IsCongruentForMorphisms( PreCompose( h_phi, h_psi ), IdentityMorphism( Source( h_phi ) ) );
+%
+IsCongruentForMorphisms( PreCompose( h_psi, h_phi ), IdentityMorphism( Source( h_psi ) ) );
+%

@@ -1,0 +1,14 @@
+%
+LoadPackage( "GradedModulePresentations" );
+LoadPackage( "ModelCategories" );
+LoadPackage( "TriangulatedCategoriesForCAP" );
+
+%
+ReadPackage( "BBGG", "examples/glp_over_g_exterior_algebra/stable_cat_of_glp_over_exterior_algebra.g" );
+%
+ReadPackage( "ModelCategories", "examples/tools/Triangulated_Structure.g" );
+%
+homotopy_chains := HomotopyCategory( chains_graded_lp_cat_sym :FinalizeCategory := false );
+AddTriangulatedStructure( homotopy_chains );
+Finalize( homotopy_chains );
+%

@@ -49,7 +49,7 @@ AddIsomorphismIntoShiftOfReverseShift( homotopy_chains,
     local replacement;
     replacement := UnderlyingReplacement( C );
     return AsMorphismInHomotopyCategoryByReplacement( 
-        UnderlyingObject( C ),
+        UnderlyingObj( C ),
         IdentityMorphism( replacement ),
         UnderlyingReplacement( C )
     );
@@ -62,7 +62,7 @@ AddIsomorphismFromShiftOfReverseShift( homotopy_chains,
     return AsMorphismInHomotopyCategoryByReplacement( 
         UnderlyingReplacement( C ),
         IdentityMorphism( replacement ),
-        UnderlyingObject( C )
+        UnderlyingObj( C )
     );
 end );
 
@@ -71,7 +71,7 @@ AddIsomorphismIntoReverseShiftOfShift( homotopy_chains,
     local replacement;
     replacement := UnderlyingReplacement( C );
     return AsMorphismInHomotopyCategoryByReplacement( 
-        UnderlyingObject( C ),
+        UnderlyingObj( C ),
         IdentityMorphism( replacement ),
         UnderlyingReplacement( C )
     );
@@ -84,7 +84,7 @@ AddIsomorphismFromReverseShiftOfShift( homotopy_chains,
     return AsMorphismInHomotopyCategoryByReplacement( 
         UnderlyingReplacement( C ),
         IdentityMorphism( replacement ),
-        UnderlyingObject( C )
+        UnderlyingObj( C )
     );
 end );
 
@@ -102,7 +102,7 @@ AddCompleteMorphismToStandardExactTriangle( homotopy_chains,
     p := NaturalProjectionFromMappingCone( replacement );
 
     i := AsMorphismInHomotopyCategoryByReplacement(
-            UnderlyingObject( Range( phi ) ),
+            UnderlyingObj( Range( phi ) ),
             i,
             MappingCone( replacement )
     );
@@ -110,7 +110,7 @@ AddCompleteMorphismToStandardExactTriangle( homotopy_chains,
     p := AsMorphismInHomotopyCategoryByReplacement(
             MappingCone( replacement ),
             p,
-            UnderlyingObject( ShiftOfObject( Source( phi ) ) )
+            UnderlyingObj( ShiftOfObject( Source( phi ) ) )
     );
 
     return CreateStandardExactTriangle( phi, i, p );
@@ -244,7 +244,7 @@ AddOctahedralAxiom( homotopy_chains,
                 ]
             );
             end, 1 );
-    i := ChainMorphism( MappingCone( g ), MappingCone( UnderlyingMorphism( t0 ) ), i );
+    i := ChainMorphism( MappingCone( g ), MappingCone( UnderlyingMor( t0 ) ), i );
     i := AsMorphismInHomotopyCategory( i );
     i := CreateTrianglesMorphism( tr, standard_tr, IdentityMorphism( tr[0] ), IdentityMorphism( tr[1] ), i );
 
@@ -260,7 +260,7 @@ AddOctahedralAxiom( homotopy_chains,
             );
             end, 1 );
     
-    j := ChainMorphism( MappingCone( UnderlyingMorphism( t0 ) ), MappingCone( g ), j );
+    j := ChainMorphism( MappingCone( UnderlyingMor( t0 ) ), MappingCone( g ), j );
     j := AsMorphismInHomotopyCategory( j );
     j := CreateTrianglesMorphism( standard_tr, tr, IdentityMorphism( tr[0] ), IdentityMorphism( tr[1] ), j );
 
