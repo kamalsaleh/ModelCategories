@@ -9,8 +9,6 @@ ReadPackage( "ModelCategories", "examples/tools/Triangulated_Structure.g" );
 R := HomalgFieldOfRationalsInSingular()*"x,y,z";;
 %
 cat := LeftPresentations( R: FinalizeCategory := false );
-AddEpimorphismFromSomeProjectiveObject( cat, CoverByFreeModule );
-SetIsAbelianCategoryWithEnoughProjectives( cat, true );
 AddIsProjective( cat, function( P ) 
                         return not Lift( IdentityMorphism( P ), CoverByFreeModule( P ) ) = fail;
                       end );
@@ -18,12 +16,6 @@ Finalize( cat );
 %
 chains := ChainComplexCategory( cat : FinalizeCategory := false );
 ModelStructureOnChainComplexes( chains );
-AddLift( chains, compute_lifts_in_chains );
-AddColift( chains, compute_colifts_in_chains );
-
-## These are general categorical operation, not only in context of Model categories.
-AddIsNullHomotopic( chains, phi -> IsZeroForMorphisms( phi ) or Colift( NaturalInjectionInMappingCone( IdentityMorphism( Source( phi ) ) ), phi ) <> fail );
-AddHomotopyMorphisms( chains, compute_homotopy_chain_morphisms_for_null_homotopic_morphism );
 
 AddAreLeftHomotopic( chains, 
     function( phi, psi )

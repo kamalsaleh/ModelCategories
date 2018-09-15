@@ -47,11 +47,6 @@ AddLift( chains, compute_lifts_in_complexes );
 
 AddColift( chains, compute_colifts_in_complexes );
 
-AddIsNullHomotopic( chains, 
-    phi -> IsZeroForMorphisms( phi ) or not Colift( NaturalInjectionInMappingCone( IdentityMorphism( Source( phi ) ) ), phi ) = fail );
-
-AddHomotopyMorphisms( chains, compute_homotopy_chain_morphisms_for_null_homotopic_morphism );
-
 ModelStructureOnChainComplexes( chains );
 
 AddAreLeftHomotopic( chains,
