@@ -30,9 +30,9 @@ DeclareAttribute( "UnderlyingModelCategory", IsCapCategory );
 
 DeclareAttribute( "UnderlyingReplacement", IsHomotopyCapCategoryCell );
 
-DeclareAttribute( "UnderlyingObject", IsHomotopyCapCategoryObject );
+DeclareAttribute( "UnderlyingObj", IsHomotopyCapCategoryObject );
 
-DeclareAttribute( "UnderlyingMorphism", IsHomotopyCapCategoryMorphism );
+DeclareAttribute( "UnderlyingMor", IsHomotopyCapCategoryMorphism );
 
 DeclareAttribute( "AsObjectInHomotopyCategory", IsCapCategoryObject );
 

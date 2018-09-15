@@ -60,7 +60,7 @@ InstallMethod( AsObjectInHomotopyCategory,
     A := rec( );
 
     ObjectifyWithAttributes( A, TheTypeOfHomotopyCapCategoryObject,
-                             UnderlyingObject, obj );
+                             UnderlyingObj, obj );
 
     AddObject( HomotopyCategory( CapCategory( obj ) ), A );
 
@@ -77,7 +77,7 @@ InstallMethod( AsMorphismInHomotopyCategory,
     phi := rec( );
 
     ObjectifyWithAttributes( phi, TheTypeOfHomotopyCapCategoryMorphism,
-                             UnderlyingMorphism, morphism,
+                             UnderlyingMor, morphism,
                              Source, AsObjectInHomotopyCategory( Source( morphism ) ),
                              Range, AsObjectInHomotopyCategory( Range( morphism ) )  );
 
@@ -116,7 +116,7 @@ InstallMethod( UnderlyingReplacement,
                [ IsHomotopyCapCategoryCell and IsCapCategoryObject ],
     function( obj )
 
-    return FibrantModel( CofibrantModel( UnderlyingObject( obj ) ) );
+    return FibrantModel( CofibrantModel( UnderlyingObj( obj ) ) );
 
 end );
 
@@ -125,7 +125,7 @@ InstallMethod( UnderlyingReplacement,
                [ IsHomotopyCapCategoryCell and IsCapCategoryMorphism ],
     function( morphism )
 
-    return MorphismBetweenFibrantModels( MorphismBetweenCofibrantModels( UnderlyingMorphism( morphism ) ) );
+    return MorphismBetweenFibrantModels( MorphismBetweenCofibrantModels( UnderlyingMor( morphism ) ) );
 
 end );
 
@@ -153,13 +153,13 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
 
     AddIsWellDefinedForObjects( homotopy_category,
         function( obj )
-        return IsWellDefined( UnderlyingObject( obj ) );
+        return IsWellDefined( UnderlyingObj( obj ) );
     end );
 
     AddIsWellDefinedForMorphisms( homotopy_category,
         function( morphism )
-        if HasUnderlyingMorphism( morphism ) then
-            return IsWellDefined( UnderlyingMorphism( morphism ) );
+        if HasUnderlyingMor( morphism ) then
+            return IsWellDefined( UnderlyingMor( morphism ) );
         else
             return IsWellDefined( UnderlyingReplacement( morphism ) ) and
                     IsEqualForObjects( UnderlyingReplacement( Source( morphism ) ), Source( UnderlyingReplacement( morphism ) ) ) and
@@ -170,13 +170,13 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
     # IsEqualForObjects
     AddIsEqualForObjects( homotopy_category,
         function( obj1, obj2 )
-            return IsEqualForObjects( UnderlyingObject( obj1 ), UnderlyingObject( obj2 ) );
+            return IsEqualForObjects( UnderlyingObj( obj1 ), UnderlyingObj( obj2 ) );
         end );
     # IsEqualForMorphisms
     AddIsEqualForMorphisms( homotopy_category,
         function( morphism1, morphism2 )
-            if HasUnderlyingMorphism( morphism1 ) and HasUnderlyingMorphism( morphism2 ) then
-                return is_equal_for_morphisms( UnderlyingMorphism( morphism1 ), UnderlyingMorphism( morphism2 ) );
+            if HasUnderlyingMor( morphism1 ) and HasUnderlyingMor( morphism2 ) then
+                return is_equal_for_morphisms( UnderlyingMor( morphism1 ), UnderlyingMor( morphism2 ) );
             else
                 return is_equal_for_morphisms( UnderlyingReplacement( morphism1 ), UnderlyingReplacement( morphism2 ) );
             fi;
@@ -189,8 +189,8 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
         function( morphism1, morphism2 )
         local morphism;
 
-        # if HasUnderlyingMorphism( morphism1 ) and HasUnderlyingMorphism( morphism2 ) then
-        #     morphism := PreCompose( UnderlyingMorphism( morphism1 ), UnderlyingMorphism( morphism2 ) );
+        # if HasUnderlyingMor( morphism1 ) and HasUnderlyingMor( morphism2 ) then
+        #     morphism := PreCompose( UnderlyingMor( morphism1 ), UnderlyingMor( morphism2 ) );
         #     AddToToDoList( ToDoListEntry( [ [ morphism1, "UnderlyingReplacement" ], [ morphism2, "UnderlyingReplacement" ]  ],
         #                                 function( )
         #                                 if not HasUnderlyingReplacement( morphism ) then
@@ -201,7 +201,7 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
         # else
             morphism := PreCompose( UnderlyingReplacement( morphism1 ), UnderlyingReplacement( morphism2 ) );
             return AsMorphismInHomotopyCategoryByReplacement(
-                UnderlyingObject( Source( morphism1 ) ), morphism, UnderlyingObject( Range( morphism2 ) )
+                UnderlyingObj( Source( morphism1 ) ), morphism, UnderlyingObj( Range( morphism2 ) )
             );
         # fi;
     end );
@@ -212,7 +212,7 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
 
       function( object )
 
-        return AsMorphismInHomotopyCategory( IdentityMorphism( UnderlyingObject( object ) ) );
+        return AsMorphismInHomotopyCategory( IdentityMorphism( UnderlyingObj( object ) ) );
 
     end );
 
@@ -226,7 +226,7 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
                                      UnderlyingReplacement( morphism2 ) );
 
         return AsMorphismInHomotopyCategoryByReplacement(
-            UnderlyingObject( Source( morphism1 ) ), sum, UnderlyingObject( Range( morphism1 ) )
+            UnderlyingObj( Source( morphism1 ) ), sum, UnderlyingObj( Range( morphism1 ) )
             );
 
     end );
@@ -254,7 +254,7 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
     function( obj )
     local underlying_obj;
 
-       underlying_obj := UnderlyingObject( obj );
+       underlying_obj := UnderlyingObj( obj );
 
        if HasIsZero( underlying_obj ) and IsZero( underlying_obj ) then
 
@@ -277,7 +277,7 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
         new_mor := AdditiveInverseForMorphisms( UnderlyingReplacement( morphism ) );
 
         return AsMorphismInHomotopyCategoryByReplacement(
-            UnderlyingObject( Source( morphism ) ), new_mor, UnderlyingObject( Range( morphism ) )
+            UnderlyingObj( Source( morphism ) ), new_mor, UnderlyingObj( Range( morphism ) )
              );
     end );
 
@@ -287,7 +287,7 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
       function( source, range )
         local zero_mor;
 
-        zero_mor := ZeroMorphism( UnderlyingObject( source ), UnderlyingObject( range ) );
+        zero_mor := ZeroMorphism( UnderlyingObj( source ), UnderlyingObj( range ) );
 
         return AsMorphismInHomotopyCategory( zero_mor );
 
@@ -296,8 +296,8 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
     ## isomorphism
     AddIsIsomorphism( homotopy_category,
         function( mor )
-        if HasUnderlyingMorphism( mor ) then
-            return IsWeakEquivalence( UnderlyingMorphism( mor ) );
+        if HasUnderlyingMor( mor ) then
+            return IsWeakEquivalence( UnderlyingMor( mor ) );
         else
 
             return IsWeakEquivalence( UnderlyingReplacement( mor ) );
@@ -332,7 +332,7 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
 
          # this is wrong, the output here is not in the correct category
          # corrected, but there is maybe a better way ..
-         return AsMorphismInHomotopyCategoryByReplacement( UnderlyingObject( Range( mor ) ), PreCompose( s, r ), UnderlyingObject( Source( mor ) ) );
+         return AsMorphismInHomotopyCategoryByReplacement( UnderlyingObj( Range( mor ) ), PreCompose( s, r ), UnderlyingObj( Source( mor ) ) );
 
          end );
 
@@ -351,7 +351,7 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
         upper_bound := ActiveUpperBound( Range( rep_phi ) );
         morphisms := MapLazy( IntegersList, j -> PreCompose( i[j], H[j] ), 1 );
         rep_inverse := ChainMorphism( Range( rep_phi ), Source( rep_phi ), morphisms );
-        return AsMorphismInHomotopyCategoryByReplacement( UnderlyingObject( Range( phi ) ), rep_inverse, UnderlyingObject( Source( phi ) ) );
+        return AsMorphismInHomotopyCategoryByReplacement( UnderlyingObj( Range( phi ) ), rep_inverse, UnderlyingObj( Source( phi ) ) );
         end, 100 );
     fi;
 
@@ -375,7 +375,7 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
       function( obj_list )
         local underlying_list, underlying_sum;
 
-        underlying_list := List( obj_list, UnderlyingObject );
+        underlying_list := List( obj_list, UnderlyingObj );
 
         underlying_sum := CallFuncList( DirectSum, underlying_list );
 
@@ -387,7 +387,7 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
         function( L, n )
         local underlying_list, i;
 
-        underlying_list := List( L, i-> UnderlyingObject( i ) );
+        underlying_list := List( L, i-> UnderlyingObj( i ) );
 
         i := InjectionOfCofactorOfDirectSum( underlying_list, n );
 
@@ -399,7 +399,7 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
         function( L, n )
         local underlying_list, i;
 
-        underlying_list := List( L, i-> UnderlyingObject( i ) );
+        underlying_list := List( L, i-> UnderlyingObj( i ) );
 
         i := ProjectionInFactorOfDirectSum( underlying_list, n );
 
@@ -430,14 +430,14 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
           );
 
         morphism := PreCompose( [ morphism1, morphism, morphism2 ] );
-        return AsMorphismInHomotopyCategoryByReplacement( UnderlyingObject( source ), morphism, UnderlyingObject( range ) );
+        return AsMorphismInHomotopyCategoryByReplacement( UnderlyingObj( source ), morphism, UnderlyingObj( range ) );
     end );
 
     AddUniversalMorphismIntoDirectSum( homotopy_category,
         function( objects_list, morphisms_list  )
         local underlying_list, morphism;
 
-        underlying_list := List( morphisms_list, i -> UnderlyingMorphism( i ) );
+        underlying_list := List( morphisms_list, i -> UnderlyingMor( i ) );
 
         morphism := UniversalMorphismIntoDirectSum( underlying_list );
 
@@ -449,7 +449,7 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
         function( objects_list, morphisms_list )
         local underlying_list, morphism;
 
-        underlying_list := List( morphisms_list, i -> UnderlyingMorphism( i ) );
+        underlying_list := List( morphisms_list, i -> UnderlyingMor( i ) );
 
         morphism := UniversalMorphismFromDirectSum( underlying_list );
 
@@ -464,9 +464,9 @@ InstallMethod( Display,
     [ IsHomotopyCapCategoryMorphism ],
     function( phi )
     Print( "A morphism in ", Name( CapCategory( phi ) ), " given by the underlying " );
-    if HasUnderlyingMorphism( phi ) then
+    if HasUnderlyingMor( phi ) then
         Print( TextAttr.4, TextAttr.underscore, "morphism", TextAttr.reset, ":\n" );
-        Display( UnderlyingMorphism( phi ) );
+        Display( UnderlyingMor( phi ) );
     else
         Print( TextAttr.4, TextAttr.underscore, "replacement", TextAttr.reset, ":\n" );
         Display( UnderlyingReplacement( phi ) );
@@ -479,5 +479,5 @@ InstallMethod( Display,
     function( obj )
     Print( "An object in ", Name( CapCategory( obj ) ), " given by the underlying " );
         Print( TextAttr.4, TextAttr.underscore, "object", TextAttr.reset, ":\n" );
-        Display( UnderlyingObject( obj ) );
+        Display( UnderlyingObj( obj ) );
 end );
