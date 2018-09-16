@@ -39,13 +39,17 @@ AddLift( cat, compute_lift_in_quiver_rep );
 
 AddColift( cat, compute_colift_in_quiver_rep );
 
+AddGeneratorsOfExternalHom( cat, BasisOfHom );
+
 Finalize( cat );
 
 chains := ChainComplexCategory( cat: FinalizeCategory := false );
 
-AddLift( chains, compute_lifts_in_complexes );
+AddLift( chains, compute_lifts_in_complexes_of_quiver_reps );
 
-AddColift( chains, compute_colifts_in_complexes );
+AddColift( chains, compute_colifts_in_complexes_of_quiver_reps );
+
+AddGeneratorsOfExternalHom( chains, generators_of_hom_for_chains_of_quiver_reps );
 
 ModelStructureOnChainComplexes( chains );
 

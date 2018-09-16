@@ -4,10 +4,6 @@ LoadPackage( "ComplexesForCAP" );
 
 ############### computing homotopy ###########################
 
-if not IsBoundGlobal( "GeneratorsOfExternalHom" ) then
-    DeclareOperation( "GeneratorsOfExternalHom", [ IsCapCategoryObject, IsCapCategoryObject ] );
-fi;
-
 Compute_Homotopy := 
   function( phi, s, n )
   local A, B, ring, r, mat, j, k, l,i, current_mat, t, b, current_b, list, var, sol, union_of_columns, union_of_rows;
@@ -351,97 +347,6 @@ is_left_homotopic_to_null :=
 
 end;
 
-##
-compute_lifts_in_chains := 
-	function( alpha, beta )
-	  local cat, U, P, N, M, alpha_, beta_, internal_hom_P_M, internal_hom_P_N, internal_hom_id_P_beta, k_internal_hom_id_P_beta_0, alpha_1, lift;
-	  cat := CapCategory( alpha );
-	  U := TensorUnit( cat );
-	  P := Source( alpha );
-	  N := Range( alpha );
-	  M := Source( beta );
-
-	  alpha_ := TensorProductToInternalHomAdjunctionMap( U, Source( alpha ), alpha );
-	  beta_  := TensorProductToInternalHomAdjunctionMap( U, Source( beta ), beta );
-
-	  internal_hom_id_P_beta := InternalHomOnMorphisms( IdentityMorphism( P ), beta );
-	  internal_hom_P_M := Source( internal_hom_id_P_beta );
-	  internal_hom_P_N := Range( internal_hom_id_P_beta );
-
-	  k_internal_hom_id_P_beta_0 := KernelLift( internal_hom_P_N^0,
-	  	PreCompose( CyclesAt( internal_hom_P_M, 0 ), internal_hom_id_P_beta[ 0 ]  ) );
-	  
-	  alpha_1 := KernelLift( internal_hom_P_N^0, alpha_[0] );
-
-	  lift := Lift( alpha_1, k_internal_hom_id_P_beta_0 );
-	  
-	  if lift = fail then
-	    	return fail;
-	  else
-
-	  	lift := ChainMorphism( U, internal_hom_P_M, [ PreCompose( lift, CyclesAt( internal_hom_P_M, 0 ) ) ], 0 );
-
-	  	return InternalHomToTensorProductAdjunctionMap( P, M, lift );
-	  fi;
-end;
-
-compute_lifts_in_cochains := 
-        function( alpha, beta )
-        local cochains_cat, chains_cat, cat, cochains_to_chains, chains_to_cochains, l;
-        cochains_cat := CapCategory( alpha );
-        cat := UnderlyingCategory( cochains_cat );
-        chains_cat := ChainComplexCategory( cat );
-        cochains_to_chains := CochainToChainComplexFunctor( cochains_cat, chains_cat );
-        chains_to_cochains := ChainToCochainComplexFunctor( chains_cat, cochains_cat );
-        l := compute_lifts_in_chains( ApplyFunctor( cochains_to_chains, alpha ), ApplyFunctor( cochains_to_chains, beta ) );
-        return ApplyFunctor( chains_to_cochains, l );
-end;
-
-compute_colifts_in_chains := 
-	function( alpha, beta )
-	  local cat, U, P, N, M, alpha_, beta_, internal_hom_P_M, internal_hom_N_M, internal_hom_alpha_id_M, k_internal_hom_alpha_id_M_0, beta_1, lift;
-	  cat := CapCategory( alpha );
-	  U := TensorUnit( cat );
-	  P := Range( alpha );
-	  N := Source( alpha );
-	  M := Range( beta );
-
-	  alpha_ := TensorProductToInternalHomAdjunctionMap( U, Source( alpha ), alpha );
-	  beta_  := TensorProductToInternalHomAdjunctionMap( U, Source( beta ), beta );
-
-	  internal_hom_alpha_id_M := InternalHomOnMorphisms( alpha, IdentityMorphism( M ) );
-	  internal_hom_P_M := Source( internal_hom_alpha_id_M );
-	  internal_hom_N_M := Range( internal_hom_alpha_id_M );
-
-	  k_internal_hom_alpha_id_M_0 := KernelLift( internal_hom_N_M^0,
-	  	PreCompose( CyclesAt( internal_hom_P_M, 0 ), internal_hom_alpha_id_M[ 0 ]  ) );
-	  
-	  beta_1 := KernelLift( internal_hom_N_M^0, beta_[0] );
-
-	  lift := Lift( beta_1, k_internal_hom_alpha_id_M_0 );
-
-	  if lift = fail then
-	  	return fail;
-	  else  
-                lift := ChainMorphism( U, internal_hom_P_M, [ PreCompose( lift, CyclesAt( internal_hom_P_M, 0 ) ) ], 0 );
-
-	  	return InternalHomToTensorProductAdjunctionMap( P, M, lift );
-	  fi;
-
-end;
-
-compute_colifts_in_cochains := 
-        function( alpha, beta )
-        local cochains_cat, chains_cat, cat, cochains_to_chains, chains_to_cochains, l;
-        cochains_cat := CapCategory( alpha );
-        cat := UnderlyingCategory( cochains_cat );
-        chains_cat := ChainComplexCategory( cat );
-        cochains_to_chains := CochainToChainComplexFunctor( cochains_cat, chains_cat );
-        chains_to_cochains := ChainToCochainComplexFunctor( chains_cat, cochains_cat );
-        l := compute_colifts_in_chains( ApplyFunctor( cochains_to_chains, alpha ), ApplyFunctor( cochains_to_chains, beta ) );
-        return ApplyFunctor( chains_to_cochains, l );
-end;
-
 generators_of_hom_for_chains := 
     function( C, D )
     local chains, H, kernel_mor_of_H, kernel_obj_of_H, morphisms_C_to_D, morphisms_from_R_to_kernel, morphisms_from_T_to_H, T;
@@ -501,17 +406,4 @@ compute_homotopy_cochain_morphisms_for_null_homotopic_morphism :=
             return MapLazy( IntegersList, n -> list[ -n ], 1 );
         fi;
 end;
-
-InstallMethodWithCache( GeneratorsOfExternalHom, 
-    [ IsChainComplex, IsChainComplex ],
-    function( C, D )
-    return generators_of_hom_for_chains( C, D );
-end );
-
-InstallMethodWithCache( GeneratorsOfExternalHom, 
-    [ IsCochainComplex, IsCochainComplex ],
-    function( C, D )
-    return generators_of_hom_for_cochains( C, D );
-end );
-
 

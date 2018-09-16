@@ -1,3 +1,6 @@
+
+if not IsBound( AddTriangulatedStructure ) then 
+
 DeclareGlobalFunction( "AddTriangulatedStructure" );
 InstallGlobalFunction( AddTriangulatedStructure,
 
@@ -275,3 +278,4 @@ Finalize( homotopy_chains );
 
 end );
 
+fi;

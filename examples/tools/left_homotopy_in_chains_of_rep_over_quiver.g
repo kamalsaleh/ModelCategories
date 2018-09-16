@@ -12,37 +12,6 @@ DeclareOperation( "LinearRightQuiver", [ IsObject, IsInt, IsInt ] );
 DeclareOperation( "LinearLeftQuiver", [ IsObject, IsInt, IsInt ] );
 DeclareOperation( "ArrowsBetweenTwoVertices", [ IsVertex, IsVertex ] );
 
-if not IsBoundGlobal( "GeneratorsOfExternalHom" ) then
-    DeclareOperation( "GeneratorsOfExternalHom", [ IsCapCategoryObject, IsCapCategoryObject ] );
-fi;
-
-if not IsBoundGlobal( "BasisOfExternalHom" ) then
-    DeclareOperation( "BasisOfExternalHom", [ IsCapCategoryObject, IsCapCategoryObject ] );
-fi;
-
-##
-InstallMethod( BasisOfExternalHom, 
-    [ IsCapCategoryObject, IsCapCategoryObject ],
-    function( M, N )
-    if IsQuiverRepresentation( M ) and IsQuiverRepresentation( N ) then
-        return BasisOfHom( M, N );
-    else
-        TryNextMethod( );
-    fi;    
-end );
-
-##
-InstallMethodWithCache( GeneratorsOfExternalHom, 
-    [ IsCapCategoryObject, IsCapCategoryObject ],
-    function( M, N )
-    if IsQuiverRepresentation( M ) and IsQuiverRepresentation( N ) then
-        return BasisOfHom( M, N );
-    else
-        TryNextMethod( );
-    fi;    
-end );
-
-
 InstallMethod( LinearQuiver,
 	[ IsDirection, IsObject, IsInt, IsInt ],
   function( d, k, m, n )
@@ -180,7 +149,7 @@ convert_rep_mor_to_complex_mor :=
     fi;
 end;
 
-generators_of_hom_for_chains :=
+generators_of_hom_for_chains_of_quiver_reps :=
     function( C1, C2 )
     local m, n, A, R1, R2, B;
 
@@ -196,26 +165,6 @@ generators_of_hom_for_chains :=
     B := BasisOfHom( R1, R2 );
     return List( B, mor -> convert_rep_mor_to_complex_mor( C1, C2, mor, A ) );
 end;
-
-InstallMethodWithCache( GeneratorsOfExternalHom, 
-    [ IsCapCategoryObject, IsCapCategoryObject ],
-    function( M, N )
-    if IsChainComplex( M ) and IsChainComplex( N ) then
-        return generators_of_hom_for_chains( M, N );
-    else
-        TryNextMethod( );
-    fi;
-end );
-
-InstallMethodWithCache( BasisOfExternalHom, 
-    [ IsCapCategoryObject, IsCapCategoryObject ],
-    function( M, N )
-    if IsChainComplex( M ) and IsChainComplex( N ) then
-        return generators_of_hom_for_chains( M, N );
-    else
-        TryNextMethod( );
-    fi;
-end );
 
 compute_lift_in_quiver_rep :=
     function( f, g )
@@ -336,7 +285,7 @@ dual_functor :=
     return dual;
 end;
 
-compute_lifts_in_complexes :=
+compute_lifts_in_complexes_of_quiver_reps :=
     function( f, g )
     local m, n, A, f_, g_, lift;
     m := Minimum( ActiveLowerBound( Source(f) ), ActiveLowerBound( Source(g) ) ) + 1;
@@ -351,7 +300,7 @@ compute_lifts_in_complexes :=
     f_ := convert_chain_or_cochain_mor_to_representation_mor( f, A );
     g_ := convert_chain_or_cochain_mor_to_representation_mor( g, A );
 
-    lift := compute_lift_in_quiver_rep( f_, g_ );
+    lift := Lift( f_, g_ );
 
     if lift = fail then
         return fail;
@@ -360,7 +309,7 @@ compute_lifts_in_complexes :=
     fi;
 end;
 
-compute_colifts_in_complexes :=
+compute_colifts_in_complexes_of_quiver_reps :=
     function( f, g )
     local m, n, A, f_, g_, colift;
     m := Minimum( ActiveLowerBound( Range(f) ), ActiveLowerBound( Range(g) ) ) + 1;
@@ -375,30 +324,13 @@ compute_colifts_in_complexes :=
     f_ := convert_chain_or_cochain_mor_to_representation_mor( f, A );
     g_ := convert_chain_or_cochain_mor_to_representation_mor( g, A );
 
-    colift := compute_colift_in_quiver_rep( f_, g_ );
+    colift := Colift( f_, g_ );
 
     if colift = fail then
         return fail;
     else
         return convert_rep_mor_to_complex_mor( Range(f), Range( g ), colift, A );
     fi;
-end;
-
-compute_homotopy_chain_morphisms_for_null_homotopic_morphism :=
-    function( f )
-    local B, C, colift;
-    B := Source( f );
-    C := Range( f );
-    colift := Colift( NaturalInjectionInMappingCone( IdentityMorphism( Source( f ) ) ), f );
-    if colift = fail then
-      return fail;
-    else
-      return MapLazy( IntegersList,
-      		n -> PreCompose(
-		MorphismBetweenDirectSums( [ [ IdentityMorphism( B[ n ] ), ZeroMorphism( B[ n ], B[ n + 1 ] ) ] ] ),
-		colift[ n + 1 ] ), 1 );
-    fi;
-    # Here: l[n]: B[n] --> C[n+1], n in Z.
 end;
 
 BeilinsonQuiverWithRelations := function( field, n )
@@ -425,90 +357,3 @@ AQ := QuotientOfPathAlgebra( kQ, v );
 return [Q,kQ,AQ];
 end;
 
-# See Demo
-#k := Rationals;
-
-#           a
-#       1 ---> 2
-#     b |      | c
-#       v      v
-#       3 ---> 4
-#           d
-
-# Q := RightQuiver("Q(4)[a:1->2,b:1->3,c:2->4,d:3->4]" );
-# kQ := PathAlgebra( k, Q );
-# AQ := QuotientOfPathAlgebra( kQ, [ kQ.ac-kQ.bd ] );
-
-# Q := RightQuiver("Q(3)[a:1->2,b:2->3]" );
-# AQ := PathAlgebra( k, Q );
-#
-# cat := CategoryOfQuiverRepresentations( AQ: FinalizeCategory := false );
-#
-# AddEpimorphismFromSomeProjectiveObject( cat, ProjectiveCover );
-# SetIsAbelianCategoryWithEnoughProjectives( cat, true );
-# AddIsProjective( cat, function( R )
-#                         return IsIsomorphism( ProjectiveCover( R ) ) ;
-#                       end );
-# AddLift( cat, compute_lift_in_quiver_rep );
-# AddColift( cat, compute_colift_in_quiver_rep );
-# Finalize( cat );
-#
-# chains := ChainComplexCategory( cat: FinalizeCategory := false );
-# AddLift( chains, compute_lifts_in_complexes );
-# AddColift( chains, compute_colifts_in_complexes );
-# AddIsNullHomotopic( chains, phi -> not Colift( NaturalInjectionInMappingCone( IdentityMorphism( Source( phi ) ) ), phi ) = fail );
-# AddHomotopyMorphisms( chains, compute_homotopy_chain_morphisms_for_null_homotopic_morphism );
-#
-# ModelStructureOnChainComplexes( chains );
-# AddAreLeftHomotopic( chains,
-#     function( phi, psi )
-#         return IsNullHomotopic( phi - psi );
-#     end );
-# Finalize( chains );
-#
-# homotopy_chains := HomotopyCategory( chains );
-# AddTriangulatedStructure( homotopy_chains );
-#
-# m12 := MatrixByRows( k, [ [ 2, 4 ] ] );
-# m23 := MatrixByRows( k, [ [ 3, 4, 5 ], [ 1, 2, 3 ] ] );
-# r1 := QuiverRepresentation( AQ, [ 1, 2, 3 ], [ m12, m23 ] );
-# r2 := QuiverRepresentation( AQ, [ 1, 1, 1 ], [ MatrixByRows( k, [ [ 2 ] ] ), MatrixByRows( k, [ [ 4 ] ] ) ] );
-# f1 := MatrixByRows( k, [ [ 5 ] ] );
-# f2 := MatrixByRows( k, [ [ 3 ], [ 1 ] ] );
-# f3 := MatrixByRows( k, [ [ 4 ], [ 0 ], [ 0 ] ] );
-# f := QuiverRepresentationHomomorphism( r1, r2, [ f1, f2, f3 ] );
-# g := KernelEmbedding( f );
-# CA := ChainComplex( [ f, g ], 5 );
-# CB := DirectSum( CA, CA );
-# # In the following I will construct a null-homotopic morphism phi:CA -> CB.
-# # Then I will test if it is really null-homotopic.
-# b56 := BasisOfHom( CA[5], CB[6] );
-# h56 := 2*b56[ 1 ]+32*b56[ 2 ]+67*b56[3]+12*b56[4]-88*b56[5]+11*b56[6];
-# b45 := BasisOfHom( CA[4], CB[5] );
-# h45 := 2018*b45[1]-92*b45[2];
-# phi4 := PreCompose( h45, CB^5 );
-# phi5 := PreCompose( CA^5, h45 ) + PreCompose( h56, CB^6 );
-# phi6 := PreCompose( CA^6, h56 );
-# phi := ChainMorphism( CA, CB, [ phi4, phi5, phi6 ], 4 );
-# IsEqualForMorphisms( PreCompose( CA^6, phi[5] ), PreCompose( phi[6], CB^6 ) );
-# IsEqualForMorphisms( PreCompose( CA^5, phi[4] ), PreCompose( phi[5], CB^5 ) );
-# IsEqualForMorphisms( PreCompose( CA^4, phi[3] ), PreCompose( phi[4], CB^4 ) );
-# IsEqualForMorphisms( PreCompose( CA^3, phi[2] ), PreCompose( phi[3], CB^3 ) );
-# Cone_CA := NaturalInjectionInMappingCone( IdentityMorphism( CA ) );
-# psi := Colift( Cone_CA, phi );
-# IsEqualForMorphisms( PreCompose( Cone_CA, psi ), phi );
-# # This means that phi is null-homotopic :)
-#
-# # Note: You can find the basis of hom_k(CA,CB) and test if they are null-homotopic :)
-# # See the above function generators_of_hom_for_chains(_,_).
-#
-#
-# A := DirectSum( IndecProjRepresentations( AQ ) );
-# C := StalkChainComplex( A, 0 );
-# L := generators_of_hom_for_chains( C, C );
-# List( L, l->IsNullHomotopic( l ) );
-# # [ false, false, false, false, false, false ]
-# List( L, l -> IsNullHomotopic( PreCompose( l, NaturalInjectionInMappingCone( l ) ) ) );
-# # [ true, true, true, true, true, true ]
-#
-# # which is exactly what one would expect

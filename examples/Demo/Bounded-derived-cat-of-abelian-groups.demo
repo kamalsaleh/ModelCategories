@@ -16,6 +16,11 @@ Finalize( cat );
 %
 chains := ChainComplexCategory( cat : FinalizeCategory := false );
 
+AddGeneratorsOfExternalHom( chains, 
+function( C, D )
+    return generators_of_hom_for_chains( C, D );
+end );
+
 ModelStructureOnChainComplexes( chains );
 AddAreLeftHomotopic( chains, 
     function( phi, psi )
