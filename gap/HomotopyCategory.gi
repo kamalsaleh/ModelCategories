@@ -133,6 +133,7 @@ InstallGlobalFunction( INSTALL_METHODS_FOR_HOMOTOPY_CATEGORIES,
     function( homotopy_category )
     local is_equal_for_morphisms, cat;
 
+    SetIsAdditiveCategory( homotopy_category, true );
     cat := UnderlyingModelCategory( homotopy_category );
 
     if CanCompute( cat, "AreLeftHomotopic" ) then
