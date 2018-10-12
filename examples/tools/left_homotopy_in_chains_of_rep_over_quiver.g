@@ -357,3 +357,40 @@ AQ := QuotientOfPathAlgebra( kQ, v );
 return [Q,kQ,AQ];
 end;
 
+CotangentBeilinsonQuiverWithRelations := function( field, n )
+local i,j,u,v,arrows,kQ,AQ,Q;
+
+for i in [ 0 .. n ] do
+for j in [ 1 .. n ] do
+Print( "---> " );
+od;
+Print( "\n" );
+od;
+
+u := "";
+for i in [ 1 .. n ] do
+for j in [ 0 .. n ] do
+u := Concatenation( u,"x",String(i),String(j),":",String(i),"->",String(i+1),"," );
+od;
+od;
+Remove( u, Length( u ) );
+u := Concatenation( "Q(", String(n+1),")[",u,"]" );
+Q := RightQuiver( u );
+arrows := Arrows( Q );
+kQ := PathAlgebra( field, Q );
+v := [ ];
+for i in [ 1 .. n-1 ] do
+for j in Combinations( [ 0 .. n ], 2 ) do
+Add( v, kQ.(Concatenation( "x", String(i),String(j[1])) )* kQ.(Concatenation( "x", String(i+1),String(j[2]) ) )+
+        kQ.(Concatenation( "x",String(i),String(j[2]) ) )* kQ.(Concatenation( "x", String(i+1),String(j[1]) ) ) );
+od;
+od;
+
+for i in [ 1 .. n-1 ] do
+for j in [ 0 .. n ] do
+Add( v, kQ.(Concatenation( "x", String(i),String(j)) )* kQ.(Concatenation( "x", String(i+1),String(j) ) ) );
+od;
+od;
+AQ := QuotientOfPathAlgebra( kQ, v );
+return [Q,kQ,AQ];
+end;
