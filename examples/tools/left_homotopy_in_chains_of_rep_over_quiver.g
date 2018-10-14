@@ -394,3 +394,38 @@ od;
 AQ := QuotientOfPathAlgebra( kQ, v );
 return [Q,kQ,AQ];
 end;
+
+kamal := function( AQ )
+local indec_projectives, n, morphisms, j, k, l, current;
+indec_projectives := Reversed( IndecProjRepresentations( AQ ) );
+n := Length( indec_projectives );
+morphisms := List( [ 1 .. n-1 ], i -> BasisOfHom( indec_projectives[i], indec_projectives[i+1] ) );
+
+for j in [ 2 .. n-1] do
+    current := [ ];
+    for k in [ 1 .. n ] do
+    for l in [ 1 .. n ] do
+        if IsZeroForMorphisms( PreCompose( morphisms[j-1][k], morphisms[j][l] ) ) then
+            current[k] := morphisms[j][l];
+        fi;
+    od;
+    od;
+    morphisms[ j ] := current;
+od;
+
+for j in [ 2 .. n-1] do
+    for k in [ 1 .. n ] do
+    for l in [ 1 .. n ] do
+        if k <> l and IsEqualForMorphisms( PreCompose( morphisms[j-1][k], morphisms[j][l] ),
+             PreCompose( morphisms[j-1][l], morphisms[j][k] ) ) then
+            morphisms[ j ][ l ] := -morphisms[ j ][ l ];
+        elif k <> l and not IsEqualForMorphisms( PreCompose( morphisms[j-1][k], morphisms[j][l] ),
+             -PreCompose( morphisms[j-1][l], morphisms[j][k] ) ) then
+            Print( "unexpected!");
+        fi;
+    od;
+    od;
+od;
+
+return morphisms;
+end;

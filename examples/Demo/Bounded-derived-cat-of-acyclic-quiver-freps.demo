@@ -6,7 +6,7 @@ field := Rationals;
 # field := HomalgFieldOfRationals();
 %
 # function to create the required data for the Beilinson quiver of D(P^2).
-P := BeilinsonQuiverWithRelations( field, 2 );;
+P := CotangentBeilinsonQuiverWithRelations( field, 2 );;
 %
 Q := P[1];
 %
