@@ -300,7 +300,7 @@ compute_lifts_in_complexes_of_quiver_reps :=
     f_ := convert_chain_or_cochain_mor_to_representation_mor( f, A );
     g_ := convert_chain_or_cochain_mor_to_representation_mor( g, A );
 
-    lift := Lift( f_, g_ );
+    lift := compute_lift_in_quiver_rep( f_, g_ );
 
     if lift = fail then
         return fail;
@@ -324,7 +324,7 @@ compute_colifts_in_complexes_of_quiver_reps :=
     f_ := convert_chain_or_cochain_mor_to_representation_mor( f, A );
     g_ := convert_chain_or_cochain_mor_to_representation_mor( g, A );
 
-    colift := Colift( f_, g_ );
+    colift := compute_colift_in_quiver_rep( f_, g_ );
 
     if colift = fail then
         return fail;
@@ -471,7 +471,7 @@ return RowsOfMatrix( RightMatrixOfLinearTransformation( MapForVertex( phi, posit
 end );
 
 morphism_between_projectives := function( AQ, record )
-local cat, projectives, i, j;
+local cat, projectives, i, j, coefficients;
 
 cat := CategoryOfQuiverRepresentations( AQ );
 projectives := Concatenation( [ ZeroObject( cat ) ], IndecProjRepresentations( AQ ) );
@@ -481,7 +481,64 @@ j := record!.indices[ 2 ];
 if record!.coefficients = [] then
     return ZeroMorphism( projectives[ i + 2 ], projectives[ j + 2 ] );
 else
-    return record!.coefficients*BasisBetweenIndecProjectives(AQ, i, j);
+    coefficients := List( record!.coefficients, c -> Rat( String( c ) ) );
+    return coefficients*BasisBetweenIndecProjectives(AQ, i, j);
 fi;
 
 end;
+
+DeclareOperation( "ListOfRecordsToMorphism", [ IsQuiverAlgebra, IsList ] );
+InstallMethod( ListOfRecordsToMorphism, [ IsQuiverAlgebra, IsList ],
+function( AQ, L )
+return MorphismBetweenDirectSums( List( L, l -> List( l, r -> morphism_between_projectives( AQ, r ) ) ) ); 
+end ); 
+
+
+DeclareAttribute( "PartitionOfProjectiveRep", IsQuiverRepresentation );
+InstallMethod( PartitionOfProjectiveRep, [ IsQuiverRepresentation ],
+function( rep )
+local AQ, indec_projectives, n, L, sol;
+AQ := AlgebraOfRepresentation( rep );
+indec_projectives := IndecProjRepresentations( AQ );
+n := Length( indec_projectives );
+L := List( indec_projectives, DimensionVector );
+sol := SolutionIntMat( L, DimensionVector( rep ) );
+if IsZero( sol ) then
+    return [ ZeroObject( rep ) ];
+else
+    return Concatenation( List( [ 1 .. n ], i -> List( [ 1 .. sol[i] ], j-> indec_projectives[i] ) ) );
+fi;
+end );
+
+DeclareAttribute( "PartitionOfProjectiveRepMor", IsQuiverRepresentationHomomorphism );
+InstallMethod( PartitionOfProjectiveRepMor, [ IsQuiverRepresentationHomomorphism ],
+function( phi )
+local AQ, indec_projectives, source, range, i, j;
+AQ := AlgebraOfRepresentation( Source( phi ) );
+indec_projectives := Concatenation( [ ZeroObject( phi ) ], IndecProjRepresentations( AQ ) );
+
+source := PartitionOfProjectiveRep( Source( phi ) );
+range := PartitionOfProjectiveRep( Range( phi ) );
+
+if Length( source ) = 1 and Length( range ) = 1 then
+    i := Position( indec_projectives, source[ 1 ] ) - 2;
+    j := Position( indec_projectives, range[ 1 ] ) - 2;
+
+    if i=-1 or j = -1 then
+        return [ [ rec( coefficients := [ ], indices := [ i, j ] ) ] ];
+    else
+        return [ [ rec( coefficients := solve( phi ), indices := [ i, j ] ) ] ];
+    fi;
+fi;
+
+return List( [ 1 .. Length( source ) ], 
+    i -> List( [ 1 .. Length( range ) ],
+        j -> PartitionOfProjectiveRepMor( PreCompose(
+            [
+                InjectionOfCofactorOfDirectSum(source, i),
+                phi,
+                ProjectionInFactorOfDirectSum(range, j )
+            ]
+) )[1][1] ) );
+
+end );
