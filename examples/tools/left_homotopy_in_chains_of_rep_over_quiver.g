@@ -395,7 +395,10 @@ AQ := QuotientOfPathAlgebra( kQ, v );
 return [Q,kQ,AQ];
 end;
 
-kamal := function( AQ )
+DeclareAttribute( "kamal", IsQuiverAlgebra );
+
+InstallMethod( kamal, [ IsQuiverAlgebra ],
+function( AQ )
 local indec_projectives, n, morphisms, j, k, l, current;
 indec_projectives := Reversed( IndecProjRepresentations( AQ ) );
 n := Length( indec_projectives );
@@ -428,4 +431,57 @@ for j in [ 2 .. n-1] do
 od;
 
 return morphisms;
+end );
+
+DeclareOperation( "BasisBetweenIndecProjectives", [ IsQuiverAlgebra, IsInt, IsInt ] );
+InstallMethodWithCache( BasisBetweenIndecProjectives, 
+        "this should return the basis of Hom( p_i,p_j )",
+        [ IsQuiverAlgebra, IsInt, IsInt ],
+    function( AQ, i, j )
+    local G, n, index, combinations, L, projectives;
+    if i<j then
+        return [ ];
+    fi;
+    
+    projectives := Reversed( IndecProjRepresentations( AQ ) );
+
+    n := Length( projectives );
+
+    if i = j then
+        return [ IdentityMorphism( projectives[ n - i ] ) ];
+    fi;
+
+    G := kamal( AQ );
+    
+    index := n - i;
+
+    combinations := Combinations( [ 1 .. n ], i - j );
+    combinations := List( combinations, comb -> Reversed( comb ) );
+    L := List( combinations, comb -> List( [ 1 .. i - j ], k-> G[index+k-1][comb[k]] ) );
+    return List( L, l -> PreCompose(l) );
+end );
+
+DeclareAttribute( "solve", IsQuiverRepresentationHomomorphism );
+InstallMethod( solve, [ IsQuiverRepresentationHomomorphism ],
+function( phi )
+local position_of_1;
+
+position_of_1 := Position( DimensionVector( Source( phi ) ), 1 );
+return RowsOfMatrix( RightMatrixOfLinearTransformation( MapForVertex( phi, position_of_1 ) ) )[1];
+end );
+
+morphism_between_projectives := function( AQ, record )
+local cat, projectives, i, j;
+
+cat := CategoryOfQuiverRepresentations( AQ );
+projectives := Concatenation( [ ZeroObject( cat ) ], IndecProjRepresentations( AQ ) );
+i := record!.indices[ 1 ];
+j := record!.indices[ 2 ];
+
+if record!.coefficients = [] then
+    return ZeroMorphism( projectives[ i + 2 ], projectives[ j + 2 ] );
+else
+    return record!.coefficients*BasisBetweenIndecProjectives(AQ, i, j);
+fi;
+
 end;

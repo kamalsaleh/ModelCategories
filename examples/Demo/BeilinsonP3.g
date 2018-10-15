@@ -18,7 +18,7 @@ field := Rationals;
 
 n := 3;
 
-P := BeilinsonQuiverWithRelations( field, n );;
+P := CotangentBeilinsonQuiverWithRelations( field, n );;
 
 Q := P[1];
 
@@ -68,6 +68,8 @@ AddTriangulatedStructure( homotopy_chains );
 # The indecomposable projective objects of the quiver
 
 indec_projectives := IndecProjRepresentations( AQ );
+
+quit;
 
 p1 := indec_projectives[1];
 
