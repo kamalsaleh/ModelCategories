@@ -1,7 +1,7 @@
 ReadPackage( "ModelCategories", "examples/tools/left_homotopy_in_chains_of_rep_over_quiver.g" );
-%
+
 field := Rationals;
-%
+
 # There are still methods in qpa that don't work with homalg fields.
 # field := HomalgFieldOfRationals();
 %
@@ -9,50 +9,51 @@ field := Rationals;
 P := CotangentBeilinsonQuiverWithRelations( field, 2 );;
 %
 Q := P[1];
-%
+
 kQ := P[2];
-%
+
 AQ := P[3];
-%
-cat := CategoryOfQuiverRepresentations( AQ: FinalizeCategory := false );
-%
-SetIsAbelianCategoryWithEnoughProjectives( cat, true );
-%
-AddEpimorphismFromSomeProjectiveObject( cat, ProjectiveCover );
-%
-AddIsProjective( cat, function( R )
+
+quiver_representations := CategoryOfQuiverRepresentations( AQ: FinalizeCategory := false );
+
+SetIsAbelianCategoryWithEnoughProjectives( quiver_representations, true );
+
+AddEpimorphismFromSomeProjectiveObject( quiver_representations, ProjectiveCover );
+
+AddIsProjective( quiver_representations, function( R )
                         return IsIsomorphism( ProjectiveCover( R ) ) ;
                       end );
 
-AddLift( cat, compute_lift_in_quiver_rep );
-%
-AddColift( cat, compute_colift_in_quiver_rep );
-%
-Finalize( cat );
-%
-chains := ChainComplexCategory( cat: FinalizeCategory := false );
-%
-AddLift( chains, compute_lifts_in_complexes_of_quiver_reps );
-%
-AddColift( chains, compute_colifts_in_complexes_of_quiver_reps );
-%
-AddGeneratorsOfExternalHom( chains, generators_of_hom_for_chains_of_quiver_reps );
-%
-ModelStructureOnChainComplexes( chains );
-%
-AddAreLeftHomotopic( chains,
+AddLift( quiver_representations, compute_lift_in_quiver_rep );
+
+AddColift( quiver_representations, compute_colift_in_quiver_rep );
+
+Finalize( quiver_representations );
+
+chains_quiver_representations := ChainComplexCategory( quiver_representations: FinalizeCategory := false );
+
+AddLift( chains_quiver_representations, compute_lifts_in_complexes_of_quiver_reps );
+
+AddColift( chains_quiver_representations, compute_colifts_in_complexes_of_quiver_reps );
+
+AddGeneratorsOfExternalHom( chains_quiver_representations, generators_of_hom_for_chains_of_quiver_reps );
+
+ModelStructureOnChainComplexes( chains_quiver_representations );
+
+AddAreLeftHomotopic( chains_quiver_representations,
     function( phi, psi )
         return IsNullHomotopic( phi - psi );
     end );
-%
-Finalize( chains );
-%
-homotopy_chains := HomotopyCategory( chains );
-%
-AddTriangulatedStructure( homotopy_chains );
-%
-# The indecomposable projective objects of the quiver
 
+Finalize( chains_quiver_representations );
+
+homotopy_chains_quiver_representations := HomotopyCategory( chains_quiver_representations );
+
+AddTriangulatedStructure( homotopy_chains_quiver_representations );
+
+Finalize( homotopy_chains_quiver_representations );
+# The indecomposable projective objects of the quiver
+%
 indec_projectives := IndecProjRepresentations( AQ );
 %
 p1 := indec_projectives[1];
