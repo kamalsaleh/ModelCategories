@@ -360,8 +360,8 @@ Add( v, kQ.(Concatenation( "x", String(i),String(j[1])) )* kQ.(Concatenation( "x
         kQ.(Concatenation( "x",String(i),String(j[2]) ) )* kQ.(Concatenation( "x", String(i+1),String(j[1]) ) ) );
 od;
 od;
-AQ := QuotientOfPathAlgebra( kQ, v );
-return [Q,kQ,AQ];
+#AQ := QuotientOfPathAlgebra( kQ, v );
+return [Q,kQ,v];
 end;
 
 CotangentBeilinsonQuiverWithRelations := function( field, n )
@@ -398,8 +398,46 @@ for j in [ 0 .. n ] do
 Add( v, kQ.(Concatenation( "x", String(i),String(j)) )* kQ.(Concatenation( "x", String(i+1),String(j) ) ) );
 od;
 od;
-AQ := QuotientOfPathAlgebra( kQ, v );
-return [Q,kQ,AQ];
+#AQ := QuotientOfPathAlgebra( kQ, v );
+return [Q,kQ,v];
+end;
+
+CotangentBeilinsonQuiverWithRelations_FC := function( field, n )
+local i,j,u,v,arrows,kQ,AQ,Q;
+
+for i in [ 0 .. n ] do
+for j in [ 1 .. n ] do
+Print( "---> " );
+od;
+Print( "\n" );
+od;
+
+u := "";
+for i in [ 1 .. n ] do
+for j in [ 0 .. n ] do
+u := Concatenation( u,"x",String(i),String(j),":",String(i),"->",String(i+1),"," );
+od;
+od;
+Remove( u, Length( u ) );
+u := Concatenation( "Q(", String(n+1),")[",u,"]" );
+Q := RightQuiver( u );
+arrows := Arrows( Q );
+kQ := PathAlgebra( field, Q );
+v := [ ];
+for i in [ 1 .. n-1 ] do
+for j in Combinations( [ 0 .. n ], 2 ) do
+Add( v, kQ.(Concatenation( "x", String(i),String(j[1])) )* kQ.(Concatenation( "x", String(i+1),String(j[2]) ) )+
+        kQ.(Concatenation( "x",String(i),String(j[2]) ) )* kQ.(Concatenation( "x", String(i+1),String(j[1]) ) ) );
+od;
+od;
+
+for i in [ 1 .. n-1 ] do
+for j in [ 0 .. n ] do
+Add( v, kQ.(Concatenation( "x", String(i),String(j)) )* kQ.(Concatenation( "x", String(i+1),String(j) ) ) );
+od;
+od;
+# AQ := Algebroid( kQ, v );
+return [Q,kQ,v];
 end;
 
 DeclareAttribute( "kamal", IsQuiverAlgebra );
@@ -477,7 +515,11 @@ position_of_1 := Position( DimensionVector( Source( phi ) ), 1 );
 return RowsOfMatrix( RightMatrixOfLinearTransformation( MapForVertex( phi, position_of_1 ) ) )[1];
 end );
 
-morphism_between_projectives := function( AQ, record )
+
+DeclareOperation( "morphism_between_projectives", [ IsQuiverAlgebra, IsRecord ] );
+InstallMethodWithCache( morphism_between_projectives,
+    [ IsQuiverAlgebra, IsRecord ],
+function( AQ, record )
 local cat, projectives, i, j, coefficients;
 
 cat := CategoryOfQuiverRepresentations( AQ );
@@ -492,7 +534,7 @@ else
     return coefficients*BasisBetweenIndecProjectives(AQ, i, j);
 fi;
 
-end;
+end );
 
 DeclareOperation( "ListOfRecordsToMorphism", [ IsQuiverAlgebra, IsList ] );
 InstallMethod( ListOfRecordsToMorphism, [ IsQuiverAlgebra, IsList ],
@@ -548,4 +590,58 @@ return List( [ 1 .. Length( source ) ],
             ]
 ) )[1][1] ) );
 
+end );
+
+
+DeclareOperation( "FromGradedLeftPresentationsToQuiverRepresentationsFunctor",
+    [ IsHomalgGradedRing, IsQuiverAlgebra ] );
+InstallMethodWithCache( FromGradedLeftPresentationsToQuiverRepresentationsFunctor,
+    [ IsHomalgGradedRing, IsQuiverAlgebra ],
+    function( S, AQ )
+    local quiver_representations, graded_lp_cat_sym, F;
+    quiver_representations := CategoryOfQuiverRepresentations( AQ );
+    graded_lp_cat_sym := GradedLeftPresentations( S );
+
+    F := CapFunctor( "From graded lp cat to quiver representations functor", graded_lp_cat_sym, quiver_representations );
+    AddObjectFunction( F, 
+        function( M )
+        local u;
+        u := UniversalMorphismIntoZeroObject( M );
+        u := ListOfRecordsToMorphism( AQ, MorphismToListOfRecords( u) );
+        return Source( u );
+    end );
+
+    AddMorphismFunction( F, 
+        function( source, phi, range )
+        return ListOfRecordsToMorphism( AQ, MorphismToListOfRecords( phi ) );
+    end );
+    
+    return F;
+end );
+
+DeclareOperation( "FromQuiverRepresentationsToGradedLeftPresentationsFunctor",
+    [ IsQuiverAlgebra, IsHomalgGradedRing ] );
+InstallMethodWithCache( FromQuiverRepresentationsToGradedLeftPresentationsFunctor,
+    [ IsQuiverAlgebra, IsHomalgGradedRing ],
+    function( AQ, S )
+    local quiver_representations, graded_lp_cat_sym, F;
+    quiver_representations := CategoryOfQuiverRepresentations( AQ );
+    graded_lp_cat_sym := GradedLeftPresentations( S );
+
+    F := CapFunctor( "From to quiver representations to graded lp cat functor", 
+        quiver_representations, graded_lp_cat_sym );
+    AddObjectFunction( F, 
+        function( rep )
+        local u;
+        u := UniversalMorphismIntoZeroObject( rep );
+        u := ListOfRecordsToMorphism( S, PartitionOfProjectiveRepMor( u ) );
+        return Source( u );
+    end );
+
+    AddMorphismFunction( F, 
+        function( source, phi, range )
+        return ListOfRecordsToMorphism( S, PartitionOfProjectiveRepMor( phi ) );
+    end );
+    
+    return F;
 end );
