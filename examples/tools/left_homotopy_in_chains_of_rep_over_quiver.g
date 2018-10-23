@@ -11,6 +11,13 @@ DeclareOperation( "LinearQuiver", [ IsDirection, IsObject, IsInt, IsInt ] );
 DeclareOperation( "LinearRightQuiver", [ IsObject, IsInt, IsInt ] );
 DeclareOperation( "LinearLeftQuiver", [ IsObject, IsInt, IsInt ] );
 DeclareOperation( "ArrowsBetweenTwoVertices", [ IsVertex, IsVertex ] );
+DeclareOperation( "BasisOfHom", [ IsQuiverRepresentation, IsQuiverRepresentation ] );
+
+InstallMethodWithCache( BasisOfHom,
+                [ IsQuiverRepresentation, IsQuiverRepresentation ],
+    function( rep1, rep2 )
+    return BasisVectors( CanonicalBasis( Hom( rep1, rep2 ) ) );
+end );
 
 InstallMethod( LinearQuiver,
 	[ IsDirection, IsObject, IsInt, IsInt ],
