@@ -31,7 +31,7 @@ Q := P[1];
 
 kQ := P[2];
 
-AQ := P[3];
+AQ := QuotientOfPathAlgebra( kQ, P[3] );
 
 quiver_representations := CategoryOfQuiverRepresentations( AQ: FinalizeCategory := false );
 

@@ -4,7 +4,7 @@ LoadPackage( "TriangulatedCategoriesForCAP" );
 LoadPackage( "FunctorCategories" );
 LoadPackage( "LinearAlgebraForCAP" );
 
-dimension_of_projective_space := 2;
+dimension_of_projective_space := 4;
 ReadPackage( "BBGG", "examples/glp_over_g_exterior_algebra/stable_cat_of_glp_over_exterior_algebra.g" );
 ReadPackage( "ModelCategories", "examples/tools/Triangulated_Structure.g" );
 homotopy_chains_graded_lp_cat_sym := HomotopyCategory( chains_graded_lp_cat_sym :FinalizeCategory := false );
@@ -42,7 +42,14 @@ B := Algebroid( k_homalg, homalg_P[3] );
 
 matrix_cat := MatrixCategory( homalg_field );
 
-quiver_reps_cat := CategoryOfQuiverRepresentations( A_quiver: FinalizeCategory := true );
+quiver_reps_cat := CategoryOfQuiverRepresentations( A_quiver: FinalizeCategory := false );
+AddGeneratorsOfExternalHom( quiver_reps_cat, 
+    function( R1, R2 ) 
+    return compute_basis_of_external_hom( R1, R2 ); 
+end );
+
+Finalize( quiver_reps_cat );
+
 functors_cat := Hom( B, matrix_cat: FinalizeCategory := true );
 
 DeclareOperation( "FromRepsCatToFunctorsCat", [ IsQuiverRepresentationCategory, IsCapCategory ] );
@@ -50,7 +57,7 @@ InstallMethodWithCache( FromRepsCatToFunctorsCat,
                         [ IsQuiverRepresentationCategory, IsCapCategory ],
 function( quiver_representations_cat, functors_cat )
 local rep_cat_to_func_cat, B, AQ, quiver, homalg_field;
-rep_cat_to_func_cat := CapFunctor( "from representations cat to functors cat", quiver_representations_cat, functors_cat );
+rep_cat_to_func_cat := CapFunctor( "Equivalence functor: representations cat -> functors cat", quiver_representations_cat, functors_cat );
 B := Source( functors_cat );
 AQ := UnderlyingQuiverAlgebra( B );
 quiver := UnderlyingQuiver( B );
@@ -109,7 +116,7 @@ InstallMethodWithCache( FromFunctorsCatToRepsCat,
     function( functors_cat, quiver_representations_cat )
     local func_cat_to_rep_cat, B, AQ, quiver, quiver_field;
 
-    func_cat_to_rep_cat := CapFunctor( "some name", functors_cat, quiver_representations_cat );
+    func_cat_to_rep_cat := CapFunctor( "Equivalence functor: functors cat -> representations cat", functors_cat, quiver_representations_cat );
     B := Source( functors_cat );
     AQ := AlgebraOfCategory( quiver_representations_cat );
     quiver := UnderlyingQuiver( B );

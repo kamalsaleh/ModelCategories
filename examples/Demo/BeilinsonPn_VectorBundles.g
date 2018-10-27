@@ -2,7 +2,8 @@ LoadPackage( "GradedModulePresentations" );
 LoadPackage( "ModelCategories" );
 LoadPackage( "TriangulatedCategoriesForCAP" );
 
-dimension_of_projective_space := 1;
+dimension_of_projective_space := InputFromUser( "Over which P^n we are going to work? n := ");
+
 ReadPackage( "BBGG", "examples/glp_over_g_exterior_algebra/stable_cat_of_glp_over_exterior_algebra.g" );
 ReadPackage( "ModelCategories", "examples/tools/Triangulated_Structure.g" );
 homotopy_chains_graded_lp_cat_sym := HomotopyCategory( chains_graded_lp_cat_sym :FinalizeCategory := false );
@@ -25,13 +26,13 @@ field := Rationals;
 #  1 ---  x11 ---> 2
 #      
 
-P := CotangentBeilinsonQuiverWithRelations( field, dimension_of_projective_space );;
+P := BeilinsonQuiverWithRelations( field, dimension_of_projective_space );;
 
 Q := P[1];
 
 kQ := P[2];
 
-AQ := P[3];
+AQ := QuotientOfPathAlgebra( kQ, P[3] ); 
 
 quiver_representations := CategoryOfQuiverRepresentations( AQ: FinalizeCategory := false );
 
@@ -46,6 +47,8 @@ AddIsProjective( quiver_representations, function( R )
 AddLift( quiver_representations, compute_lift_in_quiver_rep );
 
 AddColift( quiver_representations, compute_colift_in_quiver_rep );
+
+AddGeneratorsOfExternalHom( quiver_representations, BasisOfHom );
 
 Finalize( quiver_representations );
 

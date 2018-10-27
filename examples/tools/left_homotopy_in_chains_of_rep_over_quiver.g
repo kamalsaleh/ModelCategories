@@ -444,7 +444,17 @@ compute_colifts_in_complexes_of_quiver_reps :=
 end;
 
 BeilinsonQuiverWithRelations := function( field, n )
-local i,j,u,v,arrows,kQ,AQ,Q;
+local i,j,u,v,arrows,kQ,AQ,Q,s;
+
+s := "";
+for i in [ -n-1 .. -1 ] do
+if i <> -1 then
+    s := Concatenation( [ s, "O(", String( i ), ") --", String( n + 1 ), "--> " ] );
+else
+    s := Concatenation( [ s, "O(", String( i ), ")" ] );
+fi;
+od;
+
 u := "";
 for i in [ 1 .. n ] do
 for j in [ 0 .. n ] do
@@ -454,6 +464,7 @@ od;
 Remove( u, Length( u ) );
 u := Concatenation( "Q(", String(n+1),")[",u,"]" );
 Q := RightQuiver( u );
+Q!.String := s;
 arrows := Arrows( Q );
 kQ := PathAlgebra( field, Q );
 v := [ ];
@@ -468,37 +479,40 @@ return [Q,kQ,v];
 end;
 
 CotangentBeilinsonQuiverWithRelations := function( field, n )
-local i,j,u,v,arrows,kQ,AQ,Q;
+local i,j,u,v,arrows,kQ,AQ,Q,s;
 
-for i in [ 0 .. n ] do
-for j in [ 1 .. n ] do
-Print( "---> " );
-od;
-Print( "\n" );
+s := "";
+for i in Reversed( [ 0 .. n ] ) do
+if i <> 0 then
+    s := Concatenation(s, "Ω^", String(i), "(", String(i), ") --",String( n + 1 ),"--> " );
+else
+    s := Concatenation( s, "Ω^", String(i), "(", String(i), ")" );
+fi;
 od;
 
 u := "";
 for i in [ 1 .. n ] do
 for j in [ 0 .. n ] do
-u := Concatenation( u,"x",String(i),String(j),":",String(i),"->",String(i+1),"," );
+u := Concatenation( u,"y",String(i),String(j),":",String(i),"->",String(i+1),"," );
 od;
 od;
 Remove( u, Length( u ) );
 u := Concatenation( "Q(", String(n+1),")[",u,"]" );
 Q := RightQuiver( u );
+Q!.String := s;
 arrows := Arrows( Q );
 kQ := PathAlgebra( field, Q );
 v := [ ];
 for i in [ 1 .. n-1 ] do
 for j in Combinations( [ 0 .. n ], 2 ) do
-Add( v, kQ.(Concatenation( "x", String(i),String(j[1])) )* kQ.(Concatenation( "x", String(i+1),String(j[2]) ) )+
-        kQ.(Concatenation( "x",String(i),String(j[2]) ) )* kQ.(Concatenation( "x", String(i+1),String(j[1]) ) ) );
+Add( v, kQ.(Concatenation( "y", String(i),String(j[1])) )* kQ.(Concatenation( "y", String(i+1),String(j[2]) ) )+
+        kQ.(Concatenation( "y",String(i),String(j[2]) ) )* kQ.(Concatenation( "y", String(i+1),String(j[1]) ) ) );
 od;
 od;
 
 for i in [ 1 .. n-1 ] do
 for j in [ 0 .. n ] do
-Add( v, kQ.(Concatenation( "x", String(i),String(j)) )* kQ.(Concatenation( "x", String(i+1),String(j) ) ) );
+Add( v, kQ.(Concatenation( "y", String(i),String(j)) )* kQ.(Concatenation( "y", String(i+1),String(j) ) ) );
 od;
 od;
 #AQ := QuotientOfPathAlgebra( kQ, v );
@@ -581,8 +595,20 @@ od;
 return morphisms;
 end );
 
-DeclareOperation( "BasisBetweenIndecProjectives", [ IsQuiverAlgebra, IsInt, IsInt ] );
-InstallMethodWithCache( BasisBetweenIndecProjectives, 
+DeclareAttribute( "saleh", IsQuiverAlgebra );
+
+InstallMethod( saleh, [ IsQuiverAlgebra ],
+function( AQ )
+local projectives, n;
+
+projectives := Reversed( IndecProjRepresentations( AQ ) );
+n := Length( projectives );
+return List( [ 1 .. n - 1 ], i -> BasisOfHom( projectives[i], projectives[i+1] ) );
+end );
+
+
+DeclareOperation( "BasisBetweenCotangentBundles", [ IsQuiverAlgebra, IsInt, IsInt ] );
+InstallMethodWithCache( BasisBetweenCotangentBundles, 
         "this should return the basis of Hom( p_i,p_j )",
         [ IsQuiverAlgebra, IsInt, IsInt ],
     function( AQ, i, j )
@@ -609,6 +635,59 @@ InstallMethodWithCache( BasisBetweenIndecProjectives,
     return List( L, l -> PreCompose(l) );
 end );
 
+DeclareOperation( "BasisBetweenVectorBundles", [ IsQuiverAlgebra, IsInt, IsInt ] );
+InstallMethodWithCache( BasisBetweenVectorBundles, 
+        "this should return the basis of Hom( p_i,p_j )",
+        [ IsQuiverAlgebra, IsInt, IsInt ],
+    function( AQ, i, j )
+    local n, L, source_index, range_index, d, indices, index, projectives;
+
+    projectives := Reversed( IndecProjRepresentations( AQ ) );
+
+    n := Length( projectives );
+
+    if i >= 0 or j >= 0 or i < -n or j < -n then
+        Error( "wrong input\n");
+    fi;
+
+    if i > j then
+        return [ ];
+    fi;
+
+    source_index := Position( [ -n .. -1 ], i );
+    range_index := Position( [ -n .. -1 ], j );
+
+    if i = j then
+        return [ IdentityMorphism( projectives[ source_index ] ) ];
+    fi;
+    
+    L := saleh( AQ );
+
+    d := range_index - source_index;
+
+    indices := Cartesian( List( [ 1 .. d ], i -> [ 1 .. n ] ) );;
+    for index in indices do
+        Sort( index );
+    od;
+
+    indices := Set( indices );;
+
+    return List( indices, index -> 
+        PreCompose( List( [ 1 .. d ], i -> L[i+source_index-1][index[i]]) ) );
+end );
+
+KeyDependentOperation( "TwistedCotangentBundle", IsQuiverAlgebra, IsInt, ReturnTrue );
+InstallMethod( TwistedCotangentBundleOp, [ IsQuiverAlgebra, IsInt ],
+function( A, i )
+    return Source( BasisBetweenCotangentBundles( A, i, i )[1] );
+end );
+
+KeyDependentOperation( "StandardVectorBundle", IsQuiverAlgebra, IsInt, ReturnTrue );
+InstallMethod( StandardVectorBundleOp, [ IsQuiverAlgebra, IsInt ],
+function( A, i )
+    return Source( BasisBetweenVectorBundles( A, i, i )[1] );
+end );
+
 DeclareAttribute( "solve", IsQuiverRepresentationHomomorphism );
 InstallMethod( solve, [ IsQuiverRepresentationHomomorphism ],
 function( phi )
@@ -619,8 +698,9 @@ return RowsOfMatrix( RightMatrixOfLinearTransformation( MapForVertex( phi, posit
 end );
 
 
-DeclareOperation( "morphism_between_projectives", [ IsQuiverAlgebra, IsRecord ] );
-InstallMethodWithCache( morphism_between_projectives,
+
+DeclareOperation( "morphism_between_projectives_cotangent_bundles", [ IsQuiverAlgebra, IsRecord ] );
+InstallMethodWithCache( morphism_between_projectives_cotangent_bundles,
     [ IsQuiverAlgebra, IsRecord ],
 function( AQ, record )
 local cat, projectives, i, j, coefficients;
@@ -634,20 +714,47 @@ if record!.coefficients = [] then
     return ZeroMorphism( projectives[ i + 2 ], projectives[ j + 2 ] );
 else
     coefficients := List( record!.coefficients, c -> Rat( String( c ) ) );
-    return coefficients*BasisBetweenIndecProjectives(AQ, i, j);
+    return coefficients*BasisBetweenCotangentBundles(AQ, i, j);
 fi;
 
 end );
 
-DeclareOperation( "ListOfRecordsToMorphism", [ IsQuiverAlgebra, IsList ] );
-InstallMethod( ListOfRecordsToMorphism, [ IsQuiverAlgebra, IsList ],
+DeclareOperation( "morphism_between_projectives_vector_bundles", [ IsQuiverAlgebra, IsRecord ] );
+InstallMethodWithCache( morphism_between_projectives_vector_bundles,
+    [ IsQuiverAlgebra, IsRecord ],
+function( AQ, record )
+local cat, projectives, i, j, coefficients;
+
+cat := CategoryOfQuiverRepresentations( AQ );
+projectives := Concatenation( IndecProjRepresentations( AQ ), [ ZeroObject( cat ) ]  );
+i := record!.indices[ 1 ];
+j := record!.indices[ 2 ];
+
+if record!.coefficients = [] then
+    return ZeroMorphism( projectives[ -i ], projectives[ -j ] );
+else
+    coefficients := List( record!.coefficients, c -> Rat( String( c ) ) );
+    return coefficients*BasisBetweenVectorBundles(AQ, i, j);
+fi;
+
+end );
+
+
+DeclareOperation( "ListOfRecordsToMorphism_Cotangents", [ IsQuiverAlgebra, IsList ] );
+InstallMethod( ListOfRecordsToMorphism_Cotangents, [ IsQuiverAlgebra, IsList ],
 function( AQ, L )
-return MorphismBetweenDirectSums( List( L, l -> List( l, r -> morphism_between_projectives( AQ, r ) ) ) ); 
+return MorphismBetweenDirectSums( List( L, l -> List( l, r -> morphism_between_projectives_cotangent_bundles( AQ, r ) ) ) ); 
+end ); 
+
+DeclareOperation( "ListOfRecordsToMorphism_Vectors", [ IsQuiverAlgebra, IsList ] );
+InstallMethod( ListOfRecordsToMorphism_Vectors, [ IsQuiverAlgebra, IsList ],
+function( AQ, L )
+return MorphismBetweenDirectSums( List( L, l -> List( l, r -> morphism_between_projectives_vector_bundles( AQ, r ) ) ) ); 
 end ); 
 
 
-DeclareAttribute( "PartitionOfProjectiveRep", IsQuiverRepresentation );
-InstallMethod( PartitionOfProjectiveRep, [ IsQuiverRepresentation ],
+DeclareAttribute( "PartitionOfProjRep_Cotangent_Bundles", IsQuiverRepresentation );
+InstallMethod( PartitionOfProjRep_Cotangent_Bundles, [ IsQuiverRepresentation ],
 function( rep )
 local AQ, indec_projectives, n, L, sol;
 AQ := AlgebraOfRepresentation( rep );
@@ -662,15 +769,32 @@ else
 fi;
 end );
 
-DeclareAttribute( "PartitionOfProjectiveRepMor", IsQuiverRepresentationHomomorphism );
-InstallMethod( PartitionOfProjectiveRepMor, [ IsQuiverRepresentationHomomorphism ],
+DeclareAttribute( "PartitionOfProjRep_Vector_Bundles", IsQuiverRepresentation );
+InstallMethod( PartitionOfProjRep_Vector_Bundles, [ IsQuiverRepresentation ],
+function( rep )
+local AQ, indec_projectives, n, L, sol;
+AQ := AlgebraOfRepresentation( rep );
+indec_projectives := IndecProjRepresentations( AQ );
+n := Length( indec_projectives );
+L := List( indec_projectives, DimensionVector );
+sol := SolutionIntMat( L, DimensionVector( rep ) );
+if IsZero( sol ) then
+    return [ ZeroObject( rep ) ];
+else
+    return Concatenation( List( [ 1 .. n ], i -> List( [ 1 .. sol[i] ], j-> indec_projectives[i] ) ) );
+fi;
+end );
+
+
+DeclareAttribute( "PartitionOfProjRepMor_Cotangent_Bundles", IsQuiverRepresentationHomomorphism );
+InstallMethod( PartitionOfProjRepMor_Cotangent_Bundles, [ IsQuiverRepresentationHomomorphism ],
 function( phi )
 local AQ, indec_projectives, source, range, i, j;
 AQ := AlgebraOfRepresentation( Source( phi ) );
 indec_projectives := Concatenation( [ ZeroObject( phi ) ], IndecProjRepresentations( AQ ) );
 
-source := PartitionOfProjectiveRep( Source( phi ) );
-range := PartitionOfProjectiveRep( Range( phi ) );
+source := PartitionOfProjRep_Cotangent_Bundles( Source( phi ) );
+range := PartitionOfProjRep_Cotangent_Bundles( Range( phi ) );
 
 if Length( source ) = 1 and Length( range ) = 1 then
     i := Position( indec_projectives, source[ 1 ] ) - 2;
@@ -685,7 +809,42 @@ fi;
 
 return List( [ 1 .. Length( source ) ], 
     i -> List( [ 1 .. Length( range ) ],
-        j -> PartitionOfProjectiveRepMor( PreCompose(
+        j -> PartitionOfProjRepMor_Cotangent_Bundles( PreCompose(
+            [
+                InjectionOfCofactorOfDirectSum(source, i),
+                phi,
+                ProjectionInFactorOfDirectSum(range, j )
+            ]
+) )[1][1] ) );
+
+end );
+
+DeclareAttribute( "PartitionOfProjRepMor_Vector_Bundles", IsQuiverRepresentationHomomorphism );
+InstallMethod( PartitionOfProjRepMor_Vector_Bundles, [ IsQuiverRepresentationHomomorphism ],
+function( phi )
+local AQ, indec_projectives, source, range, i, j, n;
+AQ := AlgebraOfRepresentation( Source( phi ) );
+indec_projectives := Concatenation( IndecProjRepresentations( AQ ), [ ZeroObject( phi ) ] );
+
+n := Length( indec_projectives ) - 1;
+
+source := PartitionOfProjRep_Vector_Bundles( Source( phi ) );
+range := PartitionOfProjRep_Vector_Bundles( Range( phi ) );
+
+if Length( source ) = 1 and Length( range ) = 1 then
+    i := Position( indec_projectives, source[ 1 ] );
+    j := Position( indec_projectives, range[ 1 ] );
+
+    if i = n + 1 or j = n + 1 then
+        return [ [ rec( coefficients := [ ], indices := [ -i, -j ] ) ] ];
+    else
+        return [ [ rec( coefficients := solve( phi ), indices := [ -i, -j ] ) ] ];
+    fi;
+fi;
+
+return List( [ 1 .. Length( source ) ], 
+    i -> List( [ 1 .. Length( range ) ],
+        j -> PartitionOfProjRepMor_Vector_Bundles( PreCompose(
             [
                 InjectionOfCofactorOfDirectSum(source, i),
                 phi,
@@ -696,35 +855,62 @@ return List( [ 1 .. Length( source ) ],
 end );
 
 
-DeclareOperation( "FromGradedLeftPresentationsToQuiverRepresentationsFunctor",
+DeclareOperation( "FromGradedLeftPresToQuiverRepsFunctor_CotangentBundles",
     [ IsHomalgGradedRing, IsQuiverAlgebra ] );
-InstallMethodWithCache( FromGradedLeftPresentationsToQuiverRepresentationsFunctor,
+InstallMethodWithCache( FromGradedLeftPresToQuiverRepsFunctor_CotangentBundles,
     [ IsHomalgGradedRing, IsQuiverAlgebra ],
     function( S, AQ )
     local quiver_representations, graded_lp_cat_sym, F;
     quiver_representations := CategoryOfQuiverRepresentations( AQ );
     graded_lp_cat_sym := GradedLeftPresentations( S );
 
-    F := CapFunctor( "From graded lp cat to quiver representations functor", graded_lp_cat_sym, quiver_representations );
+    F := CapFunctor( "From graded lp cat to quiver representations functor (cotangent bundles)", graded_lp_cat_sym, quiver_representations );
     AddObjectFunction( F, 
         function( M )
         local u;
         u := UniversalMorphismIntoZeroObject( M );
-        u := ListOfRecordsToMorphism( AQ, MorphismToListOfRecords( u) );
+        u := ListOfRecordsToMorphism_Cotangents( AQ, MorphismToListOfRecords_Cotangents( u) );
         return Source( u );
     end );
 
     AddMorphismFunction( F, 
         function( source, phi, range )
-        return ListOfRecordsToMorphism( AQ, MorphismToListOfRecords( phi ) );
+        return ListOfRecordsToMorphism_Cotangents( AQ, MorphismToListOfRecords_Cotangents( phi ) );
     end );
     
     return F;
 end );
 
-DeclareOperation( "FromQuiverRepresentationsToGradedLeftPresentationsFunctor",
+
+DeclareOperation( "FromGradedLeftPresToQuiverRepsFunctor_VectorBundles",
+    [ IsHomalgGradedRing, IsQuiverAlgebra ] );
+InstallMethodWithCache( FromGradedLeftPresToQuiverRepsFunctor_VectorBundles,
+    [ IsHomalgGradedRing, IsQuiverAlgebra ],
+    function( S, AQ )
+    local quiver_representations, graded_lp_cat_sym, F;
+    quiver_representations := CategoryOfQuiverRepresentations( AQ );
+    graded_lp_cat_sym := GradedLeftPresentations( S );
+
+    F := CapFunctor( "From graded lp cat to quiver representations functor (vector bundles)", graded_lp_cat_sym, quiver_representations );
+    AddObjectFunction( F, 
+        function( M )
+        local u;
+        u := UniversalMorphismIntoZeroObject( M );
+        u := ListOfRecordsToMorphism_Vectors( AQ, MorphismToListOfRecords_VectorBundles( u) );
+        return Source( u );
+    end );
+
+    AddMorphismFunction( F, 
+        function( source, phi, range )
+        return ListOfRecordsToMorphism_Vectors( AQ, MorphismToListOfRecords_VectorBundles( phi ) );
+    end );
+    
+    return F;
+end );
+
+DeclareOperation( "FromQuiverRepsToGradedLeftPresFunctor_CotangentBundles",
     [ IsQuiverAlgebra, IsHomalgGradedRing ] );
-InstallMethodWithCache( FromQuiverRepresentationsToGradedLeftPresentationsFunctor,
+InstallMethodWithCache( FromQuiverRepsToGradedLeftPresFunctor_CotangentBundles,
     [ IsQuiverAlgebra, IsHomalgGradedRing ],
     function( AQ, S )
     local quiver_representations, graded_lp_cat_sym, F;
@@ -737,17 +923,45 @@ InstallMethodWithCache( FromQuiverRepresentationsToGradedLeftPresentationsFuncto
         function( rep )
         local u;
         u := UniversalMorphismIntoZeroObject( rep );
-        u := ListOfRecordsToMorphism( S, PartitionOfProjectiveRepMor( u ) );
+        u := ListOfRecordsToMorphism_Cotangents( S, PartitionOfProjRepMor_Cotangent_Bundles( u ) );
         return Source( u );
     end );
 
     AddMorphismFunction( F, 
         function( source, phi, range )
-        return ListOfRecordsToMorphism( S, PartitionOfProjectiveRepMor( phi ) );
+        return ListOfRecordsToMorphism_Cotangents( S, PartitionOfProjRepMor_Cotangent_Bundles( phi ) );
     end );
     
     return F;
 end );
+
+DeclareOperation( "FromQuiverRepsToGradedLeftPresFunctor_VectorBundles",
+    [ IsQuiverAlgebra, IsHomalgGradedRing ] );
+InstallMethodWithCache( FromQuiverRepsToGradedLeftPresFunctor_VectorBundles,
+    [ IsQuiverAlgebra, IsHomalgGradedRing ],
+    function( AQ, S )
+    local quiver_representations, graded_lp_cat_sym, F;
+    quiver_representations := CategoryOfQuiverRepresentations( AQ );
+    graded_lp_cat_sym := GradedLeftPresentations( S );
+
+    F := CapFunctor( "From to quiver representations to graded lp cat functor", 
+        quiver_representations, graded_lp_cat_sym );
+    AddObjectFunction( F, 
+        function( rep )
+        local u;
+        u := UniversalMorphismIntoZeroObject( rep );
+        u := ListOfRecordsToMorphism_Vectors( S, PartitionOfProjRepMor_Vector_Bundles( u ) );
+        return Source( u );
+    end );
+
+    AddMorphismFunction( F, 
+        function( source, phi, range )
+        return ListOfRecordsToMorphism_Vectors( S, PartitionOfProjRepMor_Vector_Bundles( phi ) );
+    end );
+    
+    return F;
+end );
+
 
 computing_lift_second_method := function( alpha, beta )
 local S, R, A, Q, field, S_dimensions, R_dimensions, nr_cols_in_block1, nr_cols_in_block3,
