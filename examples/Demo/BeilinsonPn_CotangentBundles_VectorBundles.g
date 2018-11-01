@@ -151,4 +151,116 @@ AddMorphismFunction( Eq_cotangent_to_vector_bundles,
     return AsMorphismInHomotopyCategory( ApplyFunctor( ChG, a ) );
 end );
 
+FromVectorBundlesToVectorBundles := function( S, A )
+local F, n;
+n := Length( IndecProjRepresentations( A ) );
+F := CapFunctor( "some name", vector_bundles_quiver_reps, vector_bundles_quiver_reps );
+AddObjectFunction( F, 
+    function( rep )
+    local i, K, G;
+    if IsZeroForObjects( rep ) then 
+        return rep;
+    fi;
 
+    for i in [ -n .. -2 ] do
+        if IsEqualForObjects( rep, StandardVectorBundle( A, i ) ) then
+            return StandardVectorBundle( A, i + 1 );
+        fi;
+    od;
+    
+    if rep = StandardVectorBundle( A, -1 ) then
+        K := Source( KoszulChainMorphism( S ) );
+        G := FromGradedLeftPresToQuiverRepsFunctor_VectorBundles(S, A);
+        G := ExtendFunctorToChainComplexCategoryFunctor( G );
+        K := ApplyFunctor( G, K );
+        return HomologyAt( K, 0 );
+    fi;
+
+    return DirectSum( List( PartitionOfProjRep_Vector_Bundles( rep ), r -> ApplyFunctor( F, r ) ) );
+end );
+
+AddMorphismFunction( F, 
+    function( source_, phi, range_ )
+    local s, r, AQ, indec_projectives, source, range, i, j, mat;
+    s := fail;
+    r := fail;
+
+    if IsZeroForMorphisms( phi ) then
+        return ZeroMorphism( source_, range_ );
+    fi;
+
+    for i in [ -n .. -2 ] do
+        if IsEqualForObjects( Source( phi ), StandardVectorBundle( A, i ) ) then
+            s := i;
+        fi;
+
+        if IsEqualForObjects( Range( phi ), StandardVectorBundle( A, i ) ) then
+            r := i;
+        fi;
+
+        if s <> fail and r <> fail then
+            break;
+        fi;
+    od;
+
+    if s <> fail and r <> fail then
+        return solve( phi )*BasisBetweenVectorBundles( A, s + 1, r + 1 );
+    fi;
+
+    if IsEqualForObjects( Source( phi ), StandardVectorBundle( A, -1 ) ) then s := -1; fi;
+    if IsEqualForObjects( Range( phi ),  StandardVectorBundle( A, -1 ) ) then r := -1; fi;
+
+    if s = -1 and r = -1 then
+        return RowsOfMatrix( RightMatrixOfLinearTransformation( MapForVertex( phi, 1 ) ) )[1]*[ IdentityMorphism( source ) ];
+    fi;
+
+    if s = -1 or r = -1 then
+        return solve( phi )* BasisBetweenVectorBundles( S, A, s + 1, r + 1 );
+    fi;
+
+    indec_projectives := Concatenation( IndecProjRepresentations( A ), [ ZeroObject( phi ) ] );
+
+    source := PartitionOfProjRep_Vector_Bundles( Source( phi ) );
+    range := PartitionOfProjRep_Vector_Bundles( Range( phi ) );
+
+    if Length( source ) = 1 and Length( range ) = 1 then
+        i := Position( indec_projectives, source[ 1 ] );
+        j := Position( indec_projectives, range[ 1 ] );
+
+        if i = n + 1 or j = n + 1 then  
+            return [ [ rec( coefficients := [ ], indices := [ -i, -j ] ) ] ];
+        else
+            return [ [ rec( coefficients := solve( phi ), indices := [ -i, -j ] ) ] ];
+        fi;
+    fi;
+
+    mat := List( [ 1 .. Length( source ) ], 
+        i -> List( [ 1 .. Length( range ) ],
+            j -> ApplyFunctor( F, PreCompose(
+                [
+                    InjectionOfCofactorOfDirectSum(source, i),
+                    phi,
+                    ProjectionInFactorOfDirectSum(range, j )
+                ]
+    ) ) ) );
+
+    return MorphismBetweenDirectSums( mat );
+end );
+
+return F;
+
+end;
+
+
+# Autofunctor_VectorBundles := CapFunctor( "Autofunctor on the homotopy category of standard Beilinson quiver",
+# homotopy_chains_vector_bundles_quiver_reps, homotopy_chains_vector_bundles_quiver_reps );
+# F := FromVectorBundlesToVectorBundles( S, A_OQ );
+# ChF := ExtendFunctorToChainComplexCategoryFunctor( F );
+# H0 := HomologyFunctorAt( chains_vector_bundles_quiver_reps, vector_bundles_quiver_reps, 0 );
+# AddObjectFunction( Autofunctor_VectorBundles,
+#     function( C )
+#     local rep_C;
+#     rep_C := UnderlyingReplacement( C );
+#     ChF_rep_C := ApplyFunctor( ChF, rep_C );
+#     
+# end );

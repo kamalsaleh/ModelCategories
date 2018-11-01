@@ -14,6 +14,31 @@ DeclareOperation( "ArrowsBetweenTwoVertices", [ IsVertex, IsVertex ] );
 DeclareOperation( "BasisOfHom", [ IsQuiverRepresentation, IsQuiverRepresentation ] );
 
 
+# The natural place for this is file matrix.gi in QPA.
+InstallMethod( KroneckerProduct, "for two QPA matrices",
+    [ IsQPAMatrix, IsQPAMatrix ],
+  function( M1, M2 )
+  local k, dim1, dim2, mat;
+
+  k := BaseDomain( M1 );
+
+  if not IsIdenticalObj( k, BaseDomain( M2 ) ) then
+    Error( "Base domains of the given matrices are not identical" );
+  fi;
+
+  dim1 := DimensionsMat( M1 );
+  dim2 := DimensionsMat( M2 );
+
+  if dim1[1]*dim2[1] = 0 or dim1[2]*dim2[2] = 0 then
+        return MatrixByRows( k, [ dim1[1]*dim2[1], dim1[2]*dim2[2] ], [] );
+  fi;
+
+  mat := KroneckerProduct( RowsOfMatrix( M1 ), RowsOfMatrix( M2 ) );
+
+  return MatrixByRows( k, [ dim1[1]*dim2[1], dim1[2]*dim2[2] ], mat );
+
+end );
+
 compute_basis_of_external_hom := function( S, R )
 local A, Q, field, S_dimensions, R_dimensions, nr_cols_in_block1, nr_cols_in_block3,
 nr_cols_in_block5, nr_of_vertices, nr_of_arrows, nr_rows_of_block, mat, L, vector,
@@ -94,7 +119,6 @@ for i in [ 1 .. nr_of_arrows ] do
 
     mat := StackMatricesVertically( mat, block );
 od;
-
 mat := NullspaceMat( TransposedMat( mat ) );
 
 if mat = fail then
@@ -306,7 +330,6 @@ compute_lift_in_quiver_rep :=
     L := List( TransposedMat( L ), l -> StackMatricesVertically( l ) );
     vector := StandardVector( k, ColsOfMatrix( L[ 1 ] )[ 1 ] );
     mat := TransposedMat( StackMatricesHorizontally( List( [ 2 .. Length( L ) ], i -> L[ i ] ) ) );
-
     sol := SolutionMat( mat, vector );
 
     if sol = fail then
@@ -335,9 +358,9 @@ compute_colift_in_quiver_rep :=
     # Thus g must be zero in order for colift to exist.
     if homs_basis = [ ] then
       if IsZeroForMorphisms( g ) then
-	return ZeroMorphism( Range( f ), Range( g ) );
+	    return ZeroMorphism( Range( f ), Range( g ) );
       else
-	return fail;
+	    return fail;
       fi;
     fi;
     Q := QuiverOfRepresentation( Source( f ) );
@@ -443,6 +466,8 @@ compute_colifts_in_complexes_of_quiver_reps :=
     fi;
 end;
 
+quit;
+
 BeilinsonQuiverWithRelations := function( field, n )
 local i,j,u,v,arrows,kQ,AQ,Q,s;
 
@@ -524,7 +549,7 @@ local i,j,u,v,arrows,kQ,AQ,Q;
 
 for i in [ 0 .. n ] do
 for j in [ 1 .. n ] do
-Print( "---> " );
+Print( "→ " );
 od;
 Print( "\n" );
 od;
@@ -676,6 +701,59 @@ InstallMethodWithCache( BasisBetweenVectorBundles,
         PreCompose( List( [ 1 .. d ], i -> L[i+source_index-1][index[i]]) ) );
 end );
 
+DeclareOperation( "BasisBetweenVectorBundles", [ IsHomalgGradedRing, IsQuiverAlgebra, IsInt, IsInt ] );
+InstallMethodWithCache( BasisBetweenVectorBundles, 
+        "this should return the basis of Hom( p_i,p_j )",
+        [ IsHomalgGradedRing, IsQuiverAlgebra, IsInt, IsInt ],
+    function( S, AQ, i, j )
+    local n, L, source_index, range_index, d, indices, index, projectives, F, VB0, vector_bundles;
+
+    if i <> 0 and j <> 0 then
+        return BasisBetweenVectorBundles( AQ, i, j );
+    fi;
+
+
+    vector_bundles := Reversed( IndecProjRepresentations( AQ ) );
+
+    n := Length( vector_bundles );
+
+    F := FromVectorBundlesToVectorBundles( S, AQ );
+
+    VB0 := ApplyFunctor( F, StandardVectorBundle( AQ, -1 ) );
+
+    Add( vector_bundles, VB0 );
+
+    if i > 0 or j > 0 or i < -n or j < -n then
+        Error( "wrong input\n");
+    fi;
+
+    if i > j then
+        return [ ];
+    fi;
+
+    source_index := Position( [ -n .. 0 ], i );
+    range_index := Position( [ -n .. 0 ], j );
+
+    if i = j then
+        return [ IdentityMorphism( vector_bundles[ source_index ] ) ];
+    fi;
+    
+    L := Concatenation( saleh( AQ ), [ BasisOfHom( vector_bundles[ n ], VB0 ) ] );
+
+    d := range_index - source_index;
+
+    indices := Cartesian( List( [ 1 .. d ], i -> [ 1 .. n ] ) );;
+    for index in indices do
+        Sort( index );
+    od;
+
+    indices := Set( indices );;
+    
+    return List( indices, index -> 
+        PreCompose( List( [ 1 .. d ], i -> L[i+source_index-1][index[i]]) ) );
+end );
+
+
 KeyDependentOperation( "TwistedCotangentBundle", IsQuiverAlgebra, IsInt, ReturnTrue );
 InstallMethod( TwistedCotangentBundleOp, [ IsQuiverAlgebra, IsInt ],
 function( A, i )
@@ -771,18 +849,39 @@ end );
 
 DeclareAttribute( "PartitionOfProjRep_Vector_Bundles", IsQuiverRepresentation );
 InstallMethod( PartitionOfProjRep_Vector_Bundles, [ IsQuiverRepresentation ],
-function( rep )
-local AQ, indec_projectives, n, L, sol;
-AQ := AlgebraOfRepresentation( rep );
-indec_projectives := IndecProjRepresentations( AQ );
-n := Length( indec_projectives );
-L := List( indec_projectives, DimensionVector );
-sol := SolutionIntMat( L, DimensionVector( rep ) );
-if IsZero( sol ) then
-    return [ ZeroObject( rep ) ];
-else
-    return Concatenation( List( [ 1 .. n ], i -> List( [ 1 .. sol[i] ], j-> indec_projectives[i] ) ) );
+function( M )
+local n, projectives, L, i, j, indices, P, A, LM, positions, current_position;
+
+if IsZeroForObjects( M ) then 
+    return [ M ];
 fi;
+
+A := AlgebraOfRepresentation( M );
+n := Length( IndecProjRepresentations( A ) );
+projectives := List( [ 1 .. n ], i -> StandardVectorBundle( A, -i ) );
+L := List( projectives, 
+    p -> List( ColsOfMatrix( RightMatrixOfLinearTransformation( Sum( List( [ (n-2)*n+1 .. (n-1)*n ], 
+    i -> MapForArrow( p, i ) ) ) ) ), 
+                col -> Sum( col ) ) );
+LM := List( ColsOfMatrix( RightMatrixOfLinearTransformation( Sum( List( [ (n-2)*n+1 .. (n-1)*n ], 
+    i -> MapForArrow( M, i ) ) ) ) ), col -> Sum( col ) );
+
+indices := [ ];
+for i in [ 1 .. n ] do
+
+    positions := [ ];
+    while PositionSublist( LM, L[i] ) <> fail do
+    current_position := PositionSublist( LM, L[i] );
+    P := [ current_position .. current_position + Length( L[i] ) -1 ];
+    for j in P do
+        LM[ j ] := -i;
+    od;
+    Add( positions, current_position );
+    od;
+    indices := Concatenation( indices, Cartesian( [ i ], positions ) );
+od;
+Sort( indices, function(u,v) return u[2]<v[2]; end );
+return List( indices, i -> projectives[ i[ 1 ] ] );
 end );
 
 
@@ -1095,3 +1194,7 @@ od;
 return QuiverRepresentationHomomorphism( S, R, matrices );
 
 end;
+
+
+
+
