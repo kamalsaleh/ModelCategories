@@ -7,5 +7,7 @@ ReadPackage( "ModelCategories", "gap/ModelCategories.gi");
 ReadPackage( "ModelCategories", "gap/DerivationMethods.gi");
 ReadPackage( "ModelCategories", "gap/complexes.gi" );
 ReadPackage( "ModelCategories", "gap/HomotopyCategory.gi" );
+ReadPackage( "ModelCategories", "gap/Triangulated_Structure.gi" );
+
 
 
