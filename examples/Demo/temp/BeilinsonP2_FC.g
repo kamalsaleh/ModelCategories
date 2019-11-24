@@ -33,7 +33,6 @@ k_quiver := quiver_P[2];
 
 A_quiver := QuotientOfPathAlgebra( quiver_P[2], quiver_P[3] );
 
-
 k_homalg := homalg_P[2];
 
 A_homalg := QuotientOfPathAlgebra( homalg_P[2], homalg_P[3] );

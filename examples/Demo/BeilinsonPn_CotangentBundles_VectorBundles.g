@@ -131,11 +131,11 @@ AddObjectFunction( Eq_cotangent_to_vector_bundles,
     function( h_rep )
     local F, ChF, a, G, ChG;
     F := FromQuiverRepsToGradedLeftPresFunctor_CotangentBundles( A_CQ, S );
-    ChF := ExtendFunctorToChainComplexCategoryFunctor( F );
+    ChF := ExtendFunctorToChainComplexCategories( F );
     a := ApplyFunctor( ChF, UnderlyingReplacement( h_rep ) );
     a := CofibrantModel( a );
     G := FromGradedLeftPresToQuiverRepsFunctor_VectorBundles( S, A_OQ );
-    ChG := ExtendFunctorToChainComplexCategoryFunctor( G );
+    ChG := ExtendFunctorToChainComplexCategories( G );
     return AsObjectInHomotopyCategory( ApplyFunctor( ChG, a ) );
 end );
 
@@ -143,11 +143,11 @@ AddMorphismFunction( Eq_cotangent_to_vector_bundles,
     function( source, phi, range )
     local F, ChF, a, G, ChG;
     F := FromQuiverRepsToGradedLeftPresFunctor_CotangentBundles( A_CQ, S );
-    ChF := ExtendFunctorToChainComplexCategoryFunctor( F );
+    ChF := ExtendFunctorToChainComplexCategories( F );
     a := ApplyFunctor( ChF, UnderlyingReplacement( phi ) );
     a := MorphismBetweenCofibrantModels( a );
     G := FromGradedLeftPresToQuiverRepsFunctor_VectorBundles( S, A_OQ );
-    ChG := ExtendFunctorToChainComplexCategoryFunctor( G );
+    ChG := ExtendFunctorToChainComplexCategories( G );
     return AsMorphismInHomotopyCategory( ApplyFunctor( ChG, a ) );
 end );
 
@@ -171,7 +171,7 @@ AddObjectFunction( F,
     if rep = StandardVectorBundle( A, -1 ) then
         K := Source( KoszulChainMorphism( S ) );
         G := FromGradedLeftPresToQuiverRepsFunctor_VectorBundles(S, A);
-        G := ExtendFunctorToChainComplexCategoryFunctor( G );
+        G := ExtendFunctorToChainComplexCategories( G );
         K := ApplyFunctor( G, K );
         return HomologyAt( K, 0 );
     fi;
@@ -255,7 +255,7 @@ end;
 # Autofunctor_VectorBundles := CapFunctor( "Autofunctor on the homotopy category of standard Beilinson quiver",
 # homotopy_chains_vector_bundles_quiver_reps, homotopy_chains_vector_bundles_quiver_reps );
 # F := FromVectorBundlesToVectorBundles( S, A_OQ );
-# ChF := ExtendFunctorToChainComplexCategoryFunctor( F );
+# ChF := ExtendFunctorToChainComplexCategories( F );
 # H0 := HomologyFunctorAt( chains_vector_bundles_quiver_reps, vector_bundles_quiver_reps, 0 );
 # AddObjectFunction( Autofunctor_VectorBundles,
 #     function( C )
