@@ -182,7 +182,7 @@ AddLifting( cat,
       cyl_f_to_cone_f := NaturalMorphismFromMappingCylinderInMappingCone( f );
       
       ## Here we need the upper bound of the projective resolution, hence we try the first 5000 indeces
-      P := ProjectiveResolutionWithBounds( MappingCone( f ), 5000 );
+      P := ProjectiveResolution( MappingCone( f ), true );
       
       P_to_cone_f := QuasiIsomorphismFromProjectiveResolution( MappingCone( f ) );
       
@@ -223,7 +223,7 @@ AddLifting( cat,
       
       M := CokernelObject( A_to_cocyl_f );
       
-      P := ProjectiveResolutionWithBounds( M, 5000 );
+      P := ProjectiveChainResolution( M, true );
       
       P_to_M := QuasiIsomorphismFromProjectiveResolution( M );
       
